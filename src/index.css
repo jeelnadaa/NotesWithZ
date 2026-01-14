@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Satoshi Font */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/font-satoshi/1.3.5/fonts/Satoshi-Variable.woff2') format('woff2'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/font-satoshi/1.3.5/fonts/Satoshi-Variable.woff') format('woff'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/font-satoshi/1.3.5/fonts/Satoshi-Light.woff') format('woff');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* Import JetBrains Mono */
+
+
+@layer base {
+  :root {
+    /* Default Pink (Coral) */
+    --color-primary: 255 158 170;
+    /* #FF9EAA */
+    --color-primary-hover: 255 132 149;
+    /* #FF8495 */
+  }
+
+  [data-theme="blue"] {
+    /* Ocean Blue */
+    --color-primary: 96 165 250;
+    /* #60A5FA */
+    --color-primary-hover: 59 130 246;
+    /* #3B82F6 */
+  }
+
+  body {
+    font-family: 'Satoshi', sans-serif;
+  }
+
+  body {
+    @apply bg-cream-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors duration-500 ease-in-out;
+    overflow: hidden;
+    /* App container handles scroll */
+  }
+
+  /* Soft focus rings */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-coral/50 dark:ring-coral/30 ring-offset-2 dark:ring-offset-dark-bg;
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-cream-300 dark:bg-gray-700 rounded-full border-2 border-transparent bg-clip-content;
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  @keyframes bounce-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+/* Custom friendly scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-cream-300 dark:bg-gray-700 rounded-full border-2 border-transparent bg-clip-content;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Editor Specific Styles */
+.editor-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.editor-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.editor-content li {
+  margin-bottom: 0.5rem;
+}
