@@ -1,8 +1,8 @@
-# Syncscribe 🌙
+# NotesWithZ 🌙
 
 > Created with **Kiro IDE** ✨
 
-Yo, welcome to **Syncscribe**! This is the notes app that actually passes the vibe check. No database, no login, just pure browser storage magic. 💅
+Yo, welcome to **NotesWithZ**! This is the notes app that actually passes the vibe check. No database, no login, just pure browser storage magic. 💅
 
 ## Features 🚀
 - **Aesthetic UI**: It's giving visuals. Clean, minimal, and aesthetic.
