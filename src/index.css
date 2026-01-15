@@ -36,8 +36,10 @@
   }
 
   /* Soft focus rings */
+  /* Soft focus rings */
+  /* Focus visible ring removed as per user request */
   *:focus-visible {
-    @apply outline-none ring-2 ring-coral/50 dark:ring-coral/30 ring-offset-2 dark:ring-offset-dark-bg;
+    @apply outline-none;
   }
 }
 
