@@ -9,6 +9,7 @@ import { NewStackModal } from './components/NewStackModal';
 import { isToday, isThisWeek, isThisMonth, isSameDay, startOfDay, endOfDay, format } from 'date-fns';
 import { ToastContainer } from './components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu } from 'lucide-react';
 import Masonry from 'react-masonry-css';
 import { CommandPalette } from './components/CommandPalette';
 import { AddToStackModal } from './components/AddToStackModal';
@@ -225,13 +226,37 @@ function App() {
     }
   };
 
+  // Mobile Sidebar State
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="flex bg-warm-50 dark:bg-dark-bg h-screen text-gray-900 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
+    <div className="flex bg-warm-50 dark:bg-dark-bg h-screen text-gray-900 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300 flex-col md:flex-row">
+
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-cream-100/80 dark:bg-dark-sidebar/90 backdrop-blur-md border-b border-white/20 dark:border-white/5 z-20">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 -ml-2 text-gray-700 dark:text-gray-200"
+          >
+            <Menu size={24} />
+          </button>
+          <h1 className="font-black text-xl tracking-tighter text-gray-900 dark:text-white">NoteZ</h1>
+        </div>
+        {/* Placeholder for right side actions if needed, e.g. New Note shorthand */}
+        <button
+          onClick={handleCreateNote}
+          className="w-10 h-10 rounded-full bg-coral text-white flex items-center justify-center shadow-soft"
+        >
+          <span className="text-xl font-bold">+</span>
+        </button>
+      </div>
+
       <Sidebar
         folders={folders}
         onCreateNote={handleCreateNote}
         selectedFolder={selectedFolderId}
-        onSelectFolder={setSelectedFolderId}
+        onSelectFolder={(id) => { setSelectedFolderId(id); setIsSidebarOpen(false); }}
         onAddFolder={addFolder}
         onDeleteFolder={confirmDeleteFolder}
         searchQuery={searchQuery}
@@ -242,11 +267,13 @@ function App() {
         onSetAccent={setCurrentAccent}
         onShowImportant={showImportantInfo}
         onOpenStackModal={() => setIsStackModalOpen(true)}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 my-4 mr-4 bg-cream-50 dark:bg-dark-surface rounded-[40px] shadow-soft dark:shadow-soft-dark relative z-10 overflow-hidden flex flex-col border border-white/60 dark:border-white/5 transition-colors duration-500">
+      <main className="flex-1 md:my-4 md:mr-4 bg-cream-50 dark:bg-dark-surface md:rounded-[40px] shadow-none md:shadow-soft dark:shadow-soft-dark relative z-10 overflow-hidden flex flex-col border-t md:border border-white/60 dark:border-white/5 transition-colors duration-500 w-full">
 
-        <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 md:p-12 custom-scrollbar">
           {/* Header */}
           <header className="flex items-center justify-between mb-8">
             <div>
