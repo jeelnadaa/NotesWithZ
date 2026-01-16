@@ -47,12 +47,18 @@ export const Sidebar = ({
             <aside className={`
                 fixed md:relative z-50 
                 w-[85vw] md:w-80 h-[100dvh] md:h-full 
-                bg-cream-100/95 md:bg-cream-100/80 dark:bg-dark-sidebar/95 md:dark:bg-dark-sidebar/90 backdrop-blur-xl 
                 flex flex-col p-6 md:p-8 flex-shrink-0 font-sans 
-                transition-all duration-300 ease-in-out
+                transition-all duration-500 ease-in-out
                 border-r md:border border-white/40 dark:border-white/5 shadow-2xl 
                 md:ml-4 md:my-4 md:rounded-[32px]
                 top-0 left-0
+                ${currentAccent === 'pink'
+                    ? 'bg-[#fff0f3]/90 md:bg-[#fff0f3]/80 dark:bg-[#201316]/95 md:dark:bg-[#201316]/90' // Pink
+                    : currentAccent === 'blue'
+                        ? 'bg-[#ecf6ff]/90 md:bg-[#ecf6ff]/80 dark:bg-[#131b2e]/95 md:dark:bg-[#131b2e]/90' // Blue
+                        : 'bg-white/95 md:bg-white/80 dark:bg-black/95 md:dark:bg-black/90' // Uncle/Neutral
+                }
+                backdrop-blur-xl 
                 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Header */}
@@ -79,10 +85,14 @@ export const Sidebar = ({
                 <div className="mb-6">
                     <button
                         onClick={() => { onCreateNote(); onClose?.(); }}
-                        className="w-full bg-coral hover:bg-coral-hover text-white rounded-[20px] py-4 px-6 flex items-center justify-between transition-all hover:scale-[1.02] active:scale-[0.98] shadow-soft shadow-coral/30 group mb-6"
+                        className={`w-full text-white rounded-[20px] py-4 px-6 flex items-center justify-between transition-all hover:scale-[1.02] active:scale-[0.98] shadow-soft mb-6
+                            ${currentAccent === 'uncle'
+                                ? 'bg-gray-900 hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200'
+                                : 'bg-coral hover:bg-coral-hover shadow-coral/30'
+                            }`}
                     >
                         <span className="flex items-center gap-3 font-bold text-lg font-mono">
-                            <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                            <span className={`w-8 h-8 rounded-full flex items-center justify-center ${currentAccent === 'uncle' ? 'bg-white/20 dark:bg-black/10' : 'bg-white/20'}`}>
                                 <Plus size={18} strokeWidth={3} />
                             </span>
                             {content.spillTea}
@@ -91,7 +101,7 @@ export const Sidebar = ({
 
                     {/* Search Bar */}
                     <div className="relative group transition-transform duration-200 hover:scale-[1.02]">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-coral transition-colors">
+                        <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${currentAccent === 'uncle' ? 'text-gray-400 group-focus-within:text-gray-900 dark:group-focus-within:text-white' : 'text-gray-400 group-focus-within:text-coral'}`}>
                             <Search size={20} />
                         </div>
                         <input
@@ -99,7 +109,8 @@ export const Sidebar = ({
                             placeholder={content.vibeCheck}
                             value={searchQuery}
                             onChange={(e) => onSearch(e.target.value)}
-                            className="w-full bg-white/50 dark:bg-dark-surface/50 text-gray-900 dark:text-white placeholder-gray-400 pl-11 pr-4 py-4 rounded-[18px] transition-all text-sm font-bold shadow-sm border-2 border-transparent focus:border-coral/20 outline-none font-mono"
+                            className={`w-full bg-white/50 dark:bg-dark-surface/50 text-gray-900 dark:text-white placeholder-gray-400 pl-11 pr-4 py-4 rounded-[18px] transition-all text-sm font-bold shadow-sm border-2 border-transparent outline-none font-mono
+                                ${currentAccent === 'uncle' ? 'focus:border-gray-400 dark:focus:border-gray-600' : 'focus:border-coral/20'}`}
                         />
                     </div>
                 </div>
@@ -127,7 +138,7 @@ export const Sidebar = ({
                                 : 'text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                                 }`}
                         >
-                            {selectedFolder === null ? <FolderOpen size={20} className="text-coral" /> : <Folder size={20} />}
+                            {selectedFolder === null ? <FolderOpen size={20} className={currentAccent === 'uncle' ? 'text-gray-900 dark:text-white' : 'text-coral'} /> : <Folder size={20} />}
                             {content.stash}
                         </button>
                     </nav>
@@ -144,13 +155,17 @@ export const Sidebar = ({
                         {/* Prominent New Stack Button */}
                         <button
                             onClick={onOpenStackModal}
-                            className="w-full flex items-center justify-between px-5 py-3.5 text-xs font-bold rounded-[18px] transition-all duration-200 bg-coral/10 hover:bg-coral/20 text-coral border border-coral/20 group mb-2"
+                            className={`w-full flex items-center justify-between px-5 py-3.5 text-xs font-bold rounded-[18px] transition-all duration-200 border group mb-2
+                                ${currentAccent === 'uncle'
+                                    ? 'bg-gray-200/50 hover:bg-gray-200 text-gray-700 dark:text-gray-300 dark:bg-white/5 dark:hover:bg-white/10 border-gray-300 dark:border-gray-700'
+                                    : 'bg-coral/10 hover:bg-coral/20 text-coral border-coral/20'
+                                }`}
                         >
                             <span className="flex items-center gap-2">
-                                <Folder size={16} className="fill-coral/20" />
+                                <Folder size={16} className={currentAccent === 'uncle' ? 'fill-gray-400/20' : 'fill-coral/20'} />
                                 {content.newStack}
                             </span>
-                            <div className="bg-coral text-white rounded-lg p-1 group-hover:scale-110 transition-transform">
+                            <div className={`rounded-lg p-1 group-hover:scale-110 transition-transform ${currentAccent === 'uncle' ? 'bg-gray-700 text-white dark:bg-white dark:text-black' : 'bg-coral text-white'}`}>
                                 <Plus size={14} strokeWidth={3} />
                             </div>
                         </button>
@@ -174,14 +189,17 @@ export const Sidebar = ({
                                             : 'text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                                             }`}
                                     >
-                                        <div className={`transition-colors ${selectedFolder === folder.id ? 'text-coral' : 'text-gray-300 dark:text-gray-600'}`}>
-                                            <Folder size={20} className={selectedFolder === folder.id ? 'fill-coral/20' : ''} />
+                                        <div className={`transition-colors ${selectedFolder === folder.id ? (currentAccent === 'uncle' ? 'text-gray-900 dark:text-white' : 'text-coral') : 'text-gray-300 dark:text-gray-600'}`}>
+                                            <Folder size={20} className={selectedFolder === folder.id ? (currentAccent === 'uncle' ? 'fill-gray-400/20' : 'fill-coral/20') : ''} />
                                         </div>
                                         {folder.name}
                                     </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); onDeleteFolder(folder.id); }}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-coral hover:bg-coral/10 rounded-xl opacity-0 group-hover/item:opacity-100 transition-all"
+                                        className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl opacity-0 group-hover/item:opacity-100 transition-all ${currentAccent === 'uncle'
+                                                ? 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                : 'text-gray-300 hover:text-coral hover:bg-coral/10'
+                                            }`}
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -207,10 +225,15 @@ export const Sidebar = ({
                                 className={`w-6 h-6 rounded-full bg-[#60A5FA] transition-transform hover:scale-110 ${currentAccent === 'blue' ? 'ring-2 ring-offset-2 ring-[#60A5FA] ring-offset-cream-100 dark:ring-offset-dark-sidebar scale-90' : ''}`}
                                 title="Blue Theme"
                             />
+                            <button
+                                onClick={() => onSetAccent('uncle')}
+                                className={`w-6 h-6 rounded-full bg-gray-400 transition-transform hover:scale-110 ${currentAccent === 'uncle' ? 'ring-2 ring-offset-2 ring-gray-400 ring-offset-cream-100 dark:ring-offset-dark-sidebar scale-90' : ''}`}
+                                title="Uncle (Neutral)"
+                            />
                             <div className="w-px h-4 bg-gray-300 dark:bg-white/20 mx-1" />
                             <button
                                 onClick={toggleTheme}
-                                className="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-300 hover:text-coral dark:hover:text-coral transition-all duration-500 hover:rotate-180"
+                                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500 hover:rotate-180 ${currentAccent === 'uncle' ? 'text-gray-400 dark:text-gray-300 hover:text-black dark:hover:text-white' : 'text-gray-400 dark:text-gray-300 hover:text-coral dark:hover:text-coral'}`}
                             >
                                 {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
                             </button>
@@ -219,7 +242,11 @@ export const Sidebar = ({
 
                     <button
                         onClick={onShowImportant}
-                        className="w-full bg-coral hover:bg-coral-hover text-white py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm uppercase font-mono tracking-wide transition-colors shadow-soft shadow-coral/30"
+                        className={`w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm uppercase font-mono tracking-wide transition-colors shadow-soft
+                            ${currentAccent === 'uncle'
+                                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/20'
+                                : 'bg-coral hover:bg-coral-hover text-white shadow-coral/30'
+                            }`}
                     >
                         <ShieldAlert size={18} />
                         {content.realTalk}

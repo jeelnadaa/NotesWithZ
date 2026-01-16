@@ -9,7 +9,10 @@ export const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel,
         const handleKeyDown = (e) => {
             if (!isOpen) return;
             if (e.key === 'Escape') onCancel();
-            if (e.key === 'Enter') onConfirm();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                onConfirm();
+            }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);

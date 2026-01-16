@@ -13,10 +13,11 @@ import { Menu } from 'lucide-react';
 import Masonry from 'react-masonry-css';
 import { CommandPalette } from './components/CommandPalette';
 import { AddToStackModal } from './components/AddToStackModal';
+import { OnboardingModal } from './components/OnboardingModal';
 import { getThemeContent } from './utils/themeContent';
 
 function App() {
-  const { notes, folders, addNote, updateNote, deleteNote, archiveNote, unarchiveNote, addFolder, deleteFolder } = useNotes();
+  const { notes, folders, addNote, updateNote, deleteNote, archiveNote, unarchiveNote, addFolder, deleteFolder, convertAllNotesToColor } = useNotes();
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   // dateFilter state
   const [dateFilter, setDateFilter] = useState(() => {
@@ -59,8 +60,13 @@ function App() {
   // Theme State
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' ||
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      // Priority: LocalStorage -> Default False (Light Mode)
+      // New users (no localStorage) will default to Light Mode as requested
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+      return false;
     }
     return false;
   });
@@ -71,6 +77,35 @@ function App() {
     }
     return 'pink';
   });
+
+  // Onboarding State
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasVisited = localStorage.getItem('onboardingComplete');
+      if (!hasVisited) {
+        setShowOnboarding(true);
+        setIsDarkMode(false); // Force Light Mode for first time
+      }
+    }
+  }, []);
+
+  const handleOnboardingSelect = (gender) => {
+    if (gender === 'male') {
+      setCurrentAccent('blue');
+    } else if (gender === 'female') {
+      setCurrentAccent('pink');
+    } else {
+      setCurrentAccent('uncle');
+      convertAllNotesToColor('monochrome');
+    }
+
+    // Save that onboarding is done
+    localStorage.setItem('onboardingComplete', 'true');
+    localStorage.setItem('theme', 'light'); // Explicitly save light mode
+    setShowOnboarding(false);
+  };
 
   const content = getThemeContent(currentAccent);
 
@@ -93,7 +128,26 @@ function App() {
 
   }, [isDarkMode, currentAccent, dateFilter]);
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const toggleTheme = () => {
+    // UNCLE MODE INTERCEPT
+    if (currentAccent === 'uncle' && !isDarkMode) {
+      setIsInfoModal(false); // Ensure it's not treated as an info modal
+      setModalConfig({
+        title: "Whoa there, Uncle! 👴",
+        message: "Are you sure you want to go to Dark Mode? It might be a bit hard on the eyes at this age. Stick to the light? \n\n (Just kidding, proceed?)",
+        onConfirm: () => {
+          setIsDarkMode(true);
+          setModalOpen(false);
+        },
+        confirmText: "I can see fine!",
+        cancelText: "Stay in Light"
+      });
+      setModalOpen(true);
+      return;
+    }
+
+    setIsDarkMode(!isDarkMode);
+  };
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -230,7 +284,14 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex bg-warm-50 dark:bg-dark-bg h-screen text-gray-900 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300 flex-col md:flex-row">
+    <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-500 flex-col md:flex-row
+      ${currentAccent === 'pink'
+        ? 'bg-[#fff5f7] dark:bg-[#1a0f12] text-gray-900 dark:text-gray-100' // Pink Theme
+        : currentAccent === 'blue'
+          ? 'bg-[#f0f9ff] dark:bg-[#0f1722] text-gray-900 dark:text-gray-100' // Blue Theme
+          : 'bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100' // Uncle / Neutral Theme
+      }
+    `}>
 
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 bg-cream-100/80 dark:bg-dark-sidebar/90 backdrop-blur-md border-b border-white/20 dark:border-white/5 z-20">
@@ -246,7 +307,11 @@ function App() {
         {/* Placeholder for right side actions if needed, e.g. New Note shorthand */}
         <button
           onClick={handleCreateNote}
-          className="w-10 h-10 rounded-full bg-coral text-white flex items-center justify-center shadow-soft"
+          className={`w-10 h-10 rounded-full flex items-center justify-center shadow-soft text-white
+             ${currentAccent === 'uncle'
+              ? 'bg-gray-900 dark:bg-white dark:text-black'
+              : 'bg-coral'
+            }`}
         >
           <span className="text-xl font-bold">+</span>
         </button>
@@ -271,7 +336,14 @@ function App() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 md:my-4 md:mr-4 bg-cream-50 dark:bg-dark-surface md:rounded-[40px] shadow-none md:shadow-soft dark:shadow-soft-dark relative z-10 overflow-hidden flex flex-col border-t md:border border-white/60 dark:border-white/5 transition-colors duration-500 w-full">
+      <main className={`flex-1 md:my-4 md:mr-4 md:rounded-[40px] shadow-none md:shadow-soft dark:shadow-soft-dark relative z-10 overflow-hidden flex flex-col border-t md:border border-white/60 dark:border-white/5 transition-colors duration-500 w-full
+        ${currentAccent === 'pink'
+          ? 'bg-white/60 dark:bg-[#25181c]/80'
+          : currentAccent === 'blue'
+            ? 'bg-white/60 dark:bg-[#151e2c]/80'
+            : 'bg-gray-50/50 dark:bg-gray-900/80' // Uncle Content
+        }
+      `}>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-12 custom-scrollbar">
           {/* Header */}
@@ -287,8 +359,11 @@ function App() {
             <div className="flex items-center gap-4">
               {/* Date Filter */}
               {!selectedFolderId && !searchQuery && (
-                <DatePicker filter={dateFilter} onFilterChange={setDateFilter} />
-              )}
+                <DatePicker
+                  selectedFilter={dateFilter}
+                  onChange={setDateFilter}
+                  currentAccent={currentAccent}
+                />)}
             </div>
           </header>
 
@@ -339,6 +414,7 @@ function App() {
             folders={folders}
             onClose={() => setIsEditorOpen(false)}
             onSave={handleSaveNote}
+            currentAccent={currentAccent}
           />
         )}
       </AnimatePresence>
@@ -351,7 +427,7 @@ function App() {
             title={modalConfig.title}
             message={modalConfig.message}
             onConfirm={modalConfig.onConfirm}
-            onCancel={() => !isInfoModal && setModalOpen(false)}
+            onCancel={() => setModalOpen(false)}
             confirmText={modalConfig.confirmText}
             cancelText={isInfoModal ? null : modalConfig.cancelText}
           />
@@ -381,6 +457,7 @@ function App() {
               setIsStackModalOpen(false);
             }}
             folders={folders}
+            currentAccent={currentAccent}
           />
         )}
       </AnimatePresence>
@@ -394,6 +471,12 @@ function App() {
             folders={folders}
             currentFolderId={moveNote.folderId}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingModal onSelect={handleOnboardingSelect} />
         )}
       </AnimatePresence>
 

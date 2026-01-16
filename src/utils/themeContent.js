@@ -32,9 +32,18 @@ export const themeContent = {
         deleteFolderCancel: "Keep safe",
 
         // Modals - Info
-        infoTitle: "Bestie, Listen Up ⚠️",
-        infoMsg: "All your tea is stored right here in this browser (Local Storage). If you clear your cache or switch devices, your notes will ghost you. We don't do clouds here. Keep it safe! 🔒",
-        infoConfirm: "Bet",
+        // Modals - Info
+        infoTitle: "The Tea 🫖",
+        infoMsg: "Bestie, Listen Up ⚠️\n\nThis app lives in your browser cache (local storage). Clearing it = deleting memories. No cloud, just vibes.\n\np.s. entire app vibe coded by Jeel Nada. no cap. 💅✨",
+        infoConfirm: "Slay",
+
+        // Font Error
+        fontLoadError: "bestie that font link is sus 💀 try another one?",
+
+        // Stack Modal
+        stackModalTitle: "New Stack ✨",
+        stackModalPlaceholder: "name your vibe...",
+        createStackBtn: "Create Vibe",
 
         // Toasts
         toastUpdated: "Thought updated! 🧠",
@@ -79,19 +88,82 @@ export const themeContent = {
         deleteFolderCancel: "Hold fire",
 
         // Modals - Info
-        infoTitle: "Yo Bro, Listen Up ⚠️",
-        infoMsg: "All data is local to this rig. clear cache or switch devices = data MIA. No cloud backups here. Stay frosty. 🔒",
-        infoConfirm: "Got it",
+        // Modals - Info
+        infoTitle: "System Intel 💾",
+        infoMsg: "Yo Bro, Intel Update ⚠️\n\nData is stored locally (browser cache). Wiping cache = nuking intel. Zero cloud, 100% private.\n\n(hidden unlock: vibe coded by Jeel Nada. stay icy 🧊)",
+        infoConfirm: "Copy That",
 
         // Toasts
         toastUpdated: "Intel updated! 🧠",
         toastCreated: "New intel secured! 🎯",
         toastDeleted: "Intel scrubbed 🗑️",
         toastArchived: "Secured in Locker 🔒",
-        toastUnarchived: "Back to Base 🤝",
+        toastUnarchived: "Back to Base 🙌",
         toastMoved: "Deployed to",
         toastStackCreated: "Sector established! 🧱",
         toastStackNuked: "Sector demolished 💥",
+
+        // Font Error
+        fontLoadError: "Connection failed. Check vector path.",
+
+        // Stack Modal
+        stackModalTitle: "New Sector",
+        stackModalPlaceholder: "Sector Name",
+        createStackBtn: "Establish Sector"
+    },
+    uncle: {
+        // Sidebar
+        spillTea: "Create Note",
+        vibeCheck: "Search notes...",
+        vault: "Archives",
+        stash: "All Notes",
+        stacks: "FOLDERS",
+        newStack: "New Folder",
+        realTalk: "About",
+
+        // Headers & Subtitles
+        vaultSubtitle: "Archived Notes",
+        folderSubtitle: "Folder View",
+        stashSubtitle: "All Notes",
+
+        // Empty States
+        noNotes: "No notes found",
+        startPrompt: "Click + to create a new note.",
+
+        // Toasts
+        toastCreated: "Note created successfully.",
+        toastUpdated: "Note updated.",
+        toastDeleted: "Note deleted.",
+        toastArchived: "Note archived.",
+        toastUnarchived: "Note unarchived.",
+        toastMoved: "Moved to",
+        toastStackCreated: "Folder created.",
+        toastStackNuked: "Folder deleted.",
+
+        // Modals - Delete Note
+        deleteNoteTitle: "Delete Note?",
+        deleteNoteMsg: "Are you sure you want to delete this note? This action cannot be undone.",
+        deleteNoteConfirm: "Delete",
+        deleteNoteCancel: "Cancel",
+
+        // Modals - Delete Folder
+        deleteFolderTitle: "Delete Folder?",
+        deleteFolderMsg: "This will delete the folder and all containing notes. Confirm?",
+        deleteFolderConfirm: "Delete Folder",
+        deleteFolderCancel: "Cancel",
+
+        // Modals - Info
+        infoTitle: "About NoteZ",
+        infoMsg: "Application Information ⚠️\n\nAll data is stored locally within your browser's cache (LocalStorage). Clearing your browser cache will result in permanent data loss. This application operates without cloud storage to ensure privacy.\n\nDeveloped by Jeel Nada.",
+        infoConfirm: "Close",
+
+        // Font Error
+        fontLoadError: "Unable to load the custom font. Please check the URL.",
+
+        // Stack Modal
+        stackModalTitle: "New Folder",
+        stackModalPlaceholder: "Folder Name",
+        createStackBtn: "Create Folder"
     }
 };
 

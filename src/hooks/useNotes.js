@@ -163,6 +163,10 @@ export function useNotes() {
         setFolders(prev => prev.filter(f => f.id !== id));
     };
 
+    const convertAllNotesToColor = (color) => {
+        setNotes(prev => prev.map(n => ({ ...n, color })));
+    };
+
     return {
         notes,
         folders,
@@ -172,6 +176,7 @@ export function useNotes() {
         archiveNote,
         unarchiveNote,
         addFolder,
-        deleteFolder
+        deleteFolder,
+        convertAllNotesToColor
     };
 }

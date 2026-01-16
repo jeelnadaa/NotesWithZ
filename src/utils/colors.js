@@ -6,4 +6,5 @@ export const colors = [
     { id: 'purple', bg: 'bg-note-purple-light dark:bg-note-purple-dark', border: 'border-note-purple-light dark:border-note-purple-dark' },
     { id: 'orange', bg: 'bg-note-orange-light dark:bg-note-orange-dark', border: 'border-note-orange-light dark:border-note-orange-dark' },
     { id: 'teal', bg: 'bg-note-teal-light dark:bg-note-teal-dark', border: 'border-note-teal-light dark:border-note-teal-dark' },
+    { id: 'monochrome', bg: 'bg-white dark:bg-gray-800', border: 'border-gray-200 dark:border-gray-700' },
 ];

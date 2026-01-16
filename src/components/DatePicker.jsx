@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, ChevronDown } from 'lucide-react';
 import {
     format,
     addMonths,
@@ -14,7 +14,7 @@ import {
 } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const DatePicker = ({ filter, onFilterChange }) => {
+export const DatePicker = ({ selectedFilter, onChange, currentAccent }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const dropdownRef = useRef(null);
@@ -91,12 +91,12 @@ export const DatePicker = ({ filter, onFilterChange }) => {
                 let isRange = false;
 
                 // Check selection state logic
-                if (filter.type === 'specific' && filter.date && isSameDay(day, filter.date)) {
+                if (selectedFilter.type === 'specific' && selectedFilter.date && isSameDay(day, selectedFilter.date)) {
                     isSelected = true;
-                } else if (filter.type === 'interval' && filter.start && filter.end) {
-                    if (day >= filter.start && day <= filter.end) {
+                } else if (selectedFilter.type === 'interval' && selectedFilter.start && selectedFilter.end) {
+                    if (day >= selectedFilter.start && day <= selectedFilter.end) {
                         isRange = true;
-                        if (isSameDay(day, filter.start) || isSameDay(day, filter.end)) {
+                        if (isSameDay(day, selectedFilter.start) || isSameDay(day, selectedFilter.end)) {
                             isSelected = true;
                             isRange = false;
                         }
@@ -108,14 +108,14 @@ export const DatePicker = ({ filter, onFilterChange }) => {
                         key={day}
                         className={`relative h-9 flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer
                             ${!isSameMonth(day, monthStart) ? "text-gray-300 dark:text-white/20" : "text-gray-700 dark:text-gray-200"}
-                            ${isRange ? "bg-coral/10 dark:bg-coral/20 first:rounded-l-full last:rounded-r-full" : "rounded-full"}
-                            ${isSelected ? "bg-coral text-white shadow-lg shadow-coral/30 scale-110 z-10 font-bold" : "hover:bg-black/5 dark:hover:bg-white/10"}
+                            ${isRange ? (currentAccent === 'uncle' ? "bg-gray-200 dark:bg-gray-700 first:rounded-l-full last:rounded-r-full" : "bg-coral/10 dark:bg-coral/20 first:rounded-l-full last:rounded-r-full") : "rounded-full"}
+                            ${isSelected ? (currentAccent === 'uncle' ? "bg-gray-900 dark:bg-white text-white dark:text-black shadow-lg shadow-gray-500/30 scale-110 z-10 font-bold" : "bg-coral text-white shadow-lg shadow-coral/30 scale-110 z-10 font-bold") : "hover:bg-black/5 dark:hover:bg-white/10"}
                         `}
                         onClick={() => handleDateClick(cloneDay)}
                     >
                         {formattedDate}
                         {isSameDay(day, new Date()) && !isSelected && (
-                            <div className="absolute bottom-1 w-1 h-1 bg-coral rounded-full"></div>
+                            <div className={`absolute bottom-1 w-1 h-1 rounded-full ${currentAccent === 'uncle' ? 'bg-gray-900 dark:bg-white' : 'bg-coral'}`}></div>
                         )}
                     </div>
                 );
@@ -132,25 +132,25 @@ export const DatePicker = ({ filter, onFilterChange }) => {
     };
 
     const handleDateClick = (day) => {
-        if (filter.type === 'interval' && filter.start && !filter.end) {
-            if (day < filter.start) {
-                onFilterChange({ type: 'interval', start: day, end: filter.start });
+        if (selectedFilter.type === 'interval' && selectedFilter.start && !selectedFilter.end) {
+            if (day < selectedFilter.start) {
+                onChange({ type: 'interval', start: day, end: selectedFilter.start });
             } else {
-                onFilterChange({ type: 'interval', start: filter.start, end: day });
+                onChange({ type: 'interval', start: selectedFilter.start, end: day });
             }
         } else {
-            if (filter.mode === 'select-interval') {
-                if (!filter.start || (filter.start && filter.end)) {
-                    onFilterChange({ ...filter, start: day, end: null, date: null });
+            if (selectedFilter.mode === 'select-interval') {
+                if (!selectedFilter.start || (selectedFilter.start && selectedFilter.end)) {
+                    onChange({ ...selectedFilter, start: day, end: null, date: null });
                 } else {
-                    if (day < filter.start) {
-                        onFilterChange({ ...filter, type: 'interval', start: day, end: filter.start, mode: 'ready' });
+                    if (day < selectedFilter.start) {
+                        onChange({ ...selectedFilter, type: 'interval', start: day, end: selectedFilter.start, mode: 'ready' });
                     } else {
-                        onFilterChange({ ...filter, type: 'interval', start: filter.start, end: day, mode: 'ready' });
+                        onChange({ ...selectedFilter, type: 'interval', start: selectedFilter.start, end: day, mode: 'ready' });
                     }
                 }
             } else {
-                onFilterChange({ type: 'specific', date: day });
+                onChange({ type: 'specific', date: day });
             }
         }
     };
@@ -163,17 +163,17 @@ export const DatePicker = ({ filter, onFilterChange }) => {
     ];
 
     const getLabel = () => {
-        if (filter.type === 'preset') {
-            if (filter.value === 'all') return 'All Time';
-            return filter.value === 'today' ? 'Today' : filter.value === 'week' ? 'This Week' : 'This Month';
+        if (selectedFilter.type === 'preset') {
+            if (selectedFilter.value === 'all') return 'All Time';
+            return selectedFilter.value === 'today' ? 'Today' : selectedFilter.value === 'week' ? 'This Week' : 'This Month';
         }
-        if (filter.type === 'specific') {
-            return format(filter.date, 'MMM d');
+        if (selectedFilter.type === 'specific') {
+            return format(selectedFilter.date, 'MMM d');
         }
-        if (filter.type === 'interval') {
-            if (!filter.start) return 'Pick dates...';
-            if (!filter.end) return `${format(filter.start, 'MMM d')} - ...`;
-            return `${format(filter.start, 'MMM d')} - ${format(filter.end, 'MMM d')}`;
+        if (selectedFilter.type === 'interval') {
+            if (!selectedFilter.start) return 'Pick dates...';
+            if (!selectedFilter.end) return `${format(selectedFilter.start, 'MMM d')} - ...`;
+            return `${format(selectedFilter.start, 'MMM d')} - ${format(selectedFilter.end, 'MMM d')}`;
         }
         return 'Filter';
     };
@@ -182,17 +182,23 @@ export const DatePicker = ({ filter, onFilterChange }) => {
         <div className="relative z-50" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-3 px-5 py-2.5 rounded-[20px] shadow-sm text-sm font-bold transition-all duration-300 border border-transparent
-                   ${isOpen ? 'bg-coral text-white shadow-soft shadow-coral/30 scale-105' : 'bg-white dark:bg-dark-surface hover:shadow-md text-gray-900 dark:text-white'}
-                `}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isOpen
+                    ? currentAccent === 'uncle'
+                        ? 'bg-gray-100 border-gray-400 dark:bg-white/10 dark:border-white/20'
+                        : 'bg-coral/10 border-coral/20'
+                    : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
+                    }`}
             >
-                <CalendarIcon size={18} />
-                <span>{getLabel()}</span>
-                {filter.type !== 'preset' && (
-                    <div onClick={(e) => { e.stopPropagation(); onFilterChange({ type: 'preset', value: 'all' }); }} className="ml-1 p-0.5 hover:bg-black/10 dark:hover:bg-white/20 rounded-full">
+                <CalendarIcon size={16} className={isOpen ? (currentAccent === 'uncle' ? 'text-gray-900 dark:text-white' : 'text-coral') : 'text-gray-500'} />
+                <span className={`text-sm font-bold ${isOpen ? (currentAccent === 'uncle' ? 'text-gray-900 dark:text-white' : 'text-coral') : 'text-gray-600 dark:text-gray-400'}`}>
+                    {getLabel()}
+                </span>
+                {selectedFilter.type !== 'preset' && (
+                    <div onClick={(e) => { e.stopPropagation(); onChange({ type: 'preset', value: 'all' }); }} className="ml-1 p-0.5 hover:bg-black/10 dark:hover:bg-white/20 rounded-full">
                         <X size={12} />
                     </div>
                 )}
+                <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''} ${isOpen ? (currentAccent === 'uncle' ? 'text-gray-900 dark:text-white' : 'text-coral') : 'text-gray-400'}`} />
             </button>
 
             <AnimatePresence>
@@ -213,10 +219,12 @@ export const DatePicker = ({ filter, onFilterChange }) => {
                             {presets.map(p => (
                                 <button
                                     key={p.value}
-                                    onClick={() => { onFilterChange({ type: 'preset', value: p.value }); setIsOpen(false); }}
-                                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${filter.type === 'preset' && filter.value === p.value
-                                        ? 'bg-white dark:bg-white/10 text-coral shadow-sm'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-coral'
+                                    onClick={() => { onChange({ type: 'preset', value: p.value }); setIsOpen(false); }}
+                                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${selectedFilter.type === 'preset' && selectedFilter.value === p.value
+                                        ? currentAccent === 'uncle'
+                                            ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-sm'
+                                            : 'bg-white dark:bg-white/10 text-coral shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                         }`}
                                 >
                                     {p.label}
@@ -234,14 +242,18 @@ export const DatePicker = ({ filter, onFilterChange }) => {
                         {/* Range Toggle */}
                         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex justify-center relative z-10">
                             <button
-                                onClick={() => onFilterChange({ ...filter, type: 'interval', start: null, end: null, mode: 'select-interval' })}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${filter.type === 'interval'
-                                    ? 'bg-coral/10 text-coral'
-                                    : 'text-gray-400 hover:text-coral hover:bg-coral/5'
+                                onClick={() => onChange({ ...selectedFilter, type: 'interval', start: null, end: null, mode: 'select-interval' })}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedFilter.type === 'interval'
+                                    ? currentAccent === 'uncle'
+                                        ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white'
+                                        : 'bg-coral/10 text-coral'
+                                    : currentAccent === 'uncle'
+                                        ? 'text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white dark:hover:bg-white/5'
+                                        : 'text-gray-400 hover:text-coral hover:bg-coral/5'
                                     }`}
                             >
                                 <Clock size={14} />
-                                {filter.type === 'interval' ? 'Select Range' : 'Custom Range'}
+                                {selectedFilter.type === 'interval' ? 'Select Range' : 'Custom Range'}
                             </button>
                         </div>
                     </motion.div>

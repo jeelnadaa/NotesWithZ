@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@400;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,4 +103,57 @@
 
 .editor-content li {
   margin-bottom: 0.5rem;
+}
+
+/* Table Styles for Editor */
+.editor-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.editor-content th,
+.editor-content td {
+  border: 1px solid currentColor;
+  opacity: 0.8;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.dark .editor-content th,
+.dark .editor-content td {
+  border-color: #374151;
+  /* gray-700 */
+}
+
+.editor-content a {
+  @apply text-blue-500 underline;
+  cursor: pointer;
+}
+
+/* Fix LaTeX alignment */
+.katex-display {
+  text-align: inherit !important;
+  margin: 0 0.25em !important;
+  display: inline !important;
+  /* Forces block math to be inline as per user request */
+}
+
+.katex-display>.katex {
+  text-align: inherit !important;
+  display: inline !important;
+}
+
+/* Ensure inline math also behaves nicely */
+p .katex {
+  display: inline-block !important;
+}
+
+.katex-html {
+  display: inline !important;
+}
+
+/* Fix for specific katex structure to not break lines */
+.katex-html {
+  display: inline-block;
 }
