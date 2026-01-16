@@ -1,6 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { Edit2, Trash2, Archive, ArchiveRestore, FolderInput } from 'lucide-react';
+import { colors } from '../utils/colors';
 
 const stripHtml = (html) => {
     const tmp = document.createElement("DIV");
@@ -9,12 +10,15 @@ const stripHtml = (html) => {
 };
 
 export function NoteCard({ note, onClick, onDelete, onArchive, onUnarchive, onAddToStack, className }) {
+    const theme = colors.find(c => c.id === note.color);
+    const bgClass = theme ? theme.bg : 'bg-white dark:bg-[#1A1A1A]';
+    const borderClass = theme ? theme.border : 'border-transparent';
+
     return (
         <div
             onClick={onClick}
-            className={`group bg-white dark:bg-[#1A1A1A] rounded-3xl p-6 hover:shadow-xl transition-all duration-300 border border-transparent hover:border-coral/20 cursor-pointer relative overflow-hidden backdrop-blur-sm ${className}`}
+            className={`group ${bgClass} rounded-3xl p-6 hover:shadow-xl transition-all duration-300 border ${borderClass} hover:border-coral/20 cursor-pointer relative overflow-hidden backdrop-blur-sm ${className}`}
         >
-            <div className={`absolute top-0 left-0 w-2 h-full bg-${note.color}-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
             <div className="flex justify-between items-start mb-4">
                 <h3 className="font-bold text-xl text-gray-900 dark:text-white line-clamp-2 leading-tight group-hover:text-coral transition-colors duration-300">
@@ -30,7 +34,7 @@ export function NoteCard({ note, onClick, onDelete, onArchive, onUnarchive, onAd
 
             <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-100 dark:border-white/5">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    {format(new Date(note.date), 'MMM d')}
+                    {format(new Date(note.date), 'MMM d, h:mm a')}
                 </span>
                 <div className="flex gap-2 transition-opacity duration-300">
                     <button
