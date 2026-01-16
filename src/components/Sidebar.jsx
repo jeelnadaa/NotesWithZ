@@ -141,6 +141,17 @@ export const Sidebar = ({
                             {selectedFolder === null ? <FolderOpen size={20} className={currentAccent === 'uncle' ? 'text-gray-900 dark:text-white' : 'text-coral'} /> : <Folder size={20} />}
                             {content.stash}
                         </button>
+
+                        <button
+                            onClick={() => onSelectFolder('TRASH')}
+                            className={`w-full flex items-center gap-4 px-5 py-3.5 text-sm font-bold rounded-[18px] transition-all duration-200 ${selectedFolder === 'TRASH'
+                                ? 'bg-white dark:bg-dark-surface text-black dark:text-white shadow-soft dark:shadow-none translate-x-1 ring-1 ring-black/5 dark:ring-white/10'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+                                }`}
+                        >
+                            <Trash2 size={20} />
+                            {content.trash}
+                        </button>
                     </nav>
 
                     {/* Divider */}
@@ -197,8 +208,8 @@ export const Sidebar = ({
                                     <button
                                         onClick={(e) => { e.stopPropagation(); onDeleteFolder(folder.id); }}
                                         className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl opacity-0 group-hover/item:opacity-100 transition-all ${currentAccent === 'uncle'
-                                                ? 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
-                                                : 'text-gray-300 hover:text-coral hover:bg-coral/10'
+                                            ? 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                            : 'text-gray-300 hover:text-coral hover:bg-coral/10'
                                             }`}
                                     >
                                         <Trash2 size={14} />

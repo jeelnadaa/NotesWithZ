@@ -127,6 +127,7 @@ export function useNotes() {
             date: new Date().toISOString(),
             color: 'yellow', // Default
             isArchived: false,
+            isDeleted: false,
             ...note,
         };
         setNotes((prev) => [newNote, ...prev]);
@@ -137,7 +138,16 @@ export function useNotes() {
     };
 
     const deleteNote = (id) => {
+        // Soft delete
+        updateNote(id, { isDeleted: true, isArchived: false, pinned: false });
+    };
+
+    const permanentlyDeleteNote = (id) => {
         setNotes((prev) => prev.filter((n) => n.id !== id));
+    };
+
+    const restoreNote = (id) => {
+        updateNote(id, { isDeleted: false });
     };
 
     const archiveNote = (id) => {
@@ -173,6 +183,8 @@ export function useNotes() {
         addNote,
         updateNote,
         deleteNote,
+        permanentlyDeleteNote,
+        restoreNote,
         archiveNote,
         unarchiveNote,
         addFolder,

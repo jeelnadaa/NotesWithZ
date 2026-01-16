@@ -7,6 +7,8 @@ export const themeContent = {
         stash: "The Stash",
         stacks: "Stacks",
         newStack: "New Stack",
+        trash: "The Dumpster",
+        trashSubtitle: "Bad vibes only",
         realTalk: "Real Talk ⚠️",
 
         // Headers
@@ -19,11 +21,22 @@ export const themeContent = {
         noNotes: "No vibes yet",
         startPrompt: "Hit that \"Spill Tea\" button to start.",
 
-        // Modals - Delete Note
-        deleteNoteTitle: "Yeet this thought?",
-        deleteNoteMsg: "This note is about to be ghosted forever. You sure?",
-        deleteNoteConfirm: "Yeet it",
-        deleteNoteCancel: "Wait, no",
+        // Modals - Soft Delete (To Trash)
+        deleteNoteTitle: "Yeet to Dumpster?",
+        deleteNoteMsg: "This vibe is getting trashed. (You can restore it later)",
+        deleteNoteConfirm: "Trash it",
+        deleteNoteCancel: "Keep it",
+
+        // Modals - Permanent Delete
+        permDeleteNoteTitle: "Delete Forever?",
+        permDeleteNoteMsg: "This is the end of the line. No coming back. You sure?",
+        permDeleteNoteConfirm: "Nuke it",
+        permDeleteNoteCancel: "Wait, no",
+
+        // Modals - Restore
+        toastRestored: "Vibe restored! ✨",
+        toastSoftDeleted: "Tossed in the dumpster 🗑️",
+        toastPermanentlyDeleted: "Vibe obliterated 💥",
 
         // Modals - Delete Folder
         deleteFolderTitle: "Nuke Stack?",
@@ -63,6 +76,8 @@ export const themeContent = {
         stash: "The Base",
         stacks: "Sectors",
         newStack: "New Sector",
+        trash: "Recycle Bin",
+        trashSubtitle: "Awaiting disposal",
         realTalk: "No Cap ⚠️",
 
         // Headers
@@ -75,11 +90,22 @@ export const themeContent = {
         noNotes: "No intel yet",
         startPrompt: "Hit \"Spit Facts\" to log info.",
 
-        // Modals - Delete Note
-        deleteNoteTitle: "Scrub this intel?",
-        deleteNoteMsg: "This data will be permanently erased. Confirm?",
-        deleteNoteConfirm: "Scrub it",
+        // Modals - Soft Delete (To Trash)
+        deleteNoteTitle: "Scrub to Bin?",
+        deleteNoteMsg: "Moving intel to Recycle Bin. Recoverable if needed.",
+        deleteNoteConfirm: "Bin it",
         deleteNoteCancel: "Abort",
+
+        // Modals - Permanent Delete
+        permDeleteNoteTitle: "Permanent Erasure?",
+        permDeleteNoteMsg: "This data will be unrecoverable. Confirm deletion?",
+        permDeleteNoteConfirm: "Erase",
+        permDeleteNoteCancel: "Abort",
+
+        // Toasts
+        toastRestored: "Intel recovered! 🔄",
+        toastSoftDeleted: "Intel binned 🗑️",
+        toastPermanentlyDeleted: "Data scrubbed 💥",
 
         // Modals - Delete Folder
         deleteFolderTitle: "Demolish Sector?",
@@ -119,6 +145,8 @@ export const themeContent = {
         stash: "All Notes",
         stacks: "FOLDERS",
         newStack: "New Folder",
+        trash: "Trash",
+        trashSubtitle: "Deleted Notes",
         realTalk: "About",
 
         // Headers & Subtitles
@@ -140,11 +168,22 @@ export const themeContent = {
         toastStackCreated: "Folder created.",
         toastStackNuked: "Folder deleted.",
 
-        // Modals - Delete Note
-        deleteNoteTitle: "Delete Note?",
-        deleteNoteMsg: "Are you sure you want to delete this note? This action cannot be undone.",
-        deleteNoteConfirm: "Delete",
+        // Modals - Soft Delete (To Trash)
+        deleteNoteTitle: "Move to Trash?",
+        deleteNoteMsg: "This note will be moved to the Trash. You can restore it later.",
+        deleteNoteConfirm: "Move to Trash",
         deleteNoteCancel: "Cancel",
+
+        // Modals - Permanent Delete
+        permDeleteNoteTitle: "Delete Forever?",
+        permDeleteNoteMsg: "This action is irreversible. Are you sure?",
+        permDeleteNoteConfirm: "Delete Forever",
+        permDeleteNoteCancel: "Cancel",
+
+        // Toasts
+        toastRestored: "Note restored.",
+        toastSoftDeleted: "Note moved to Trash.",
+        toastPermanentlyDeleted: "Note permanently deleted.",
 
         // Modals - Delete Folder
         deleteFolderTitle: "Delete Folder?",

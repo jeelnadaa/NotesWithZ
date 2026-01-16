@@ -45,7 +45,7 @@ const fontFamilies = [
 
 import { getThemeContent } from '../utils/themeContent';
 
-export const Editor = ({ note, onClose, onSave, folders, currentAccent }) => {
+export const Editor = ({ note, onClose, onSave, folders, currentAccent, readOnly = false }) => {
     const [title, setTitle] = useState(note?.title || '');
     const [content, setContent] = useState(note?.content || '');
     const [selectedColor, setSelectedColor] = useState(() => {
@@ -400,8 +400,9 @@ export const Editor = ({ note, onClose, onSave, folders, currentAccent }) => {
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        readOnly={readOnly}
                         placeholder="Thought Title..."
-                        className="text-3xl font-black bg-transparent border-none outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-200 w-full tracking-tight"
+                        className={`text-3xl font-black bg-transparent border-none outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-200 w-full tracking-tight ${readOnly ? 'cursor-default' : ''}`}
                     />
                     <button
                         onClick={onClose}
@@ -413,205 +414,207 @@ export const Editor = ({ note, onClose, onSave, folders, currentAccent }) => {
                 </div>
 
                 {/* Toolbar */}
-                <div className="px-4 sm:px-8 pb-4 flex items-center gap-1 overflow-visible relative z-20 flex-wrap">
-                    <div className="flex bg-white/30 dark:bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm shadow-sm border border-white/10 mb-2 sm:mb-0 relative z-30">
-                        <ToolbarButton icon={Bold} onClick={() => handleFormat('bold')} title="Bold (Ctrl+B)" />
-                        <ToolbarButton icon={Italic} onClick={() => handleFormat('italic')} title="Italic (Ctrl+I)" />
-                        <ToolbarButton icon={Underline} onClick={() => handleFormat('underline')} title="Underline (Ctrl+U)" />
+                {!readOnly && (
+                    <div className="px-4 sm:px-8 pb-4 flex items-center gap-1 overflow-visible relative z-20 flex-wrap">
+                        <div className="flex bg-white/30 dark:bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm shadow-sm border border-white/10 mb-2 sm:mb-0 relative z-30">
+                            <ToolbarButton icon={Bold} onClick={() => handleFormat('bold')} title="Bold (Ctrl+B)" />
+                            <ToolbarButton icon={Italic} onClick={() => handleFormat('italic')} title="Italic (Ctrl+I)" />
+                            <ToolbarButton icon={Underline} onClick={() => handleFormat('underline')} title="Underline (Ctrl+U)" />
 
-                        <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
+                            <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
 
-                        {/* Font Size Dropdown */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
-                                title="Font Size"
-                                className={`p-2.5 rounded-xl text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-1 ${isFontMenuOpen ? 'bg-white/50 dark:bg-white/10' : 'hover:bg-white/40 dark:hover:bg-black/20'}`}
-                            >
-                                <span className="text-xs font-bold">Size</span>
-                                <ChevronDown size={12} className={`transition-transform duration-200 ${isFontMenuOpen ? 'rotate-180' : ''}`} />
-                            </button>
+                            {/* Font Size Dropdown */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
+                                    title="Font Size"
+                                    className={`p-2.5 rounded-xl text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-1 ${isFontMenuOpen ? 'bg-white/50 dark:bg-white/10' : 'hover:bg-white/40 dark:hover:bg-black/20'}`}
+                                >
+                                    <span className="text-xs font-bold">Size</span>
+                                    <ChevronDown size={12} className={`transition-transform duration-200 ${isFontMenuOpen ? 'rotate-180' : ''}`} />
+                                </button>
 
-                            {isFontMenuOpen && (
-                                <div className="absolute top-full left-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col p-1 animate-fadeIn origin-top-left z-[50]">
-                                    {fontSizes.map((size) => (
-                                        <button
-                                            key={size.value}
-                                            onClick={() => handleFormat('fontSize', size.value)}
-                                            className="px-4 py-2 text-left text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-coral/10 hover:text-coral rounded-lg transition-colors flex items-center justify-between"
-                                        >
-                                            {size.label}
-                                            {size.value === '5' && <span className="text-[10px] bg-gray-100 dark:bg-gray-700 px-1.5 rounded text-gray-500">Lg</span>}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Font Family Dropdown */}
-                        <div className="relative" ref={fontMenuRef}>
-                            <button
-                                onClick={() => setIsFontFamilyMenuOpen(!isFontFamilyMenuOpen)}
-                                title="Font Family"
-                                className={`p-2.5 rounded-xl text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-1 ${isFontFamilyMenuOpen ? 'bg-white/50 dark:bg-white/10' : 'hover:bg-white/40 dark:hover:bg-black/20'}`}
-                            >
-                                <Type size={18} />
-                                <ChevronDown size={12} className={`transition-transform duration-200 ${isFontFamilyMenuOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {isFontFamilyMenuOpen && (
-                                <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-visible flex flex-col p-1 animate-fadeIn origin-top-left z-[60]">
-                                    {/* Predefined Fonts */}
-                                    {fontFamilies.map((font) => (
-                                        <button
-                                            key={font.label}
-                                            onClick={() => {
-                                                document.execCommand('styleWithCSS', false, true);
-                                                document.execCommand('fontName', false, font.value);
-                                                document.execCommand('styleWithCSS', false, false);
-                                                setIsFontFamilyMenuOpen(false);
-                                                if (contentRef.current) setContent(contentRef.current.innerHTML);
-                                            }}
-                                            style={{ fontFamily: font.value === 'Satoshi' ? 'Satoshi, sans-serif' : font.value }}
-                                            className="px-4 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-coral/10 hover:text-coral rounded-lg transition-colors flex items-center justify-between"
-                                        >
-                                            {font.label}
-                                        </button>
-                                    ))}
-
-                                    <div className="h-px bg-gray-100 dark:bg-gray-700 my-1" />
-
-                                    {/* Custom URL Input Area */}
-                                    <div className="p-2">
-                                        <p className="text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider ml-1">Custom Font (URL)</p>
-                                        <div className="flex items-center gap-1 bg-gray-50 dark:bg-black/20 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
-                                            <input
-                                                type="text"
-                                                placeholder="https://..."
-                                                value={customFontUrl}
-                                                onChange={(e) => setCustomFontUrl(e.target.value)}
-                                                onKeyDown={(e) => e.key === 'Enter' && handleCustomFontLoad()}
-                                                className="w-full px-2 py-1 text-xs bg-transparent border-none outline-none text-gray-700 dark:text-gray-300"
-                                            />
+                                {isFontMenuOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col p-1 animate-fadeIn origin-top-left z-[50]">
+                                        {fontSizes.map((size) => (
                                             <button
-                                                onClick={handleCustomFontLoad}
-                                                disabled={!customFontUrl}
-                                                className="p-1 rounded-md bg-white dark:bg-gray-700 text-coral disabled:opacity-50 shadow-sm hover:scale-105 transition-transform"
+                                                key={size.value}
+                                                onClick={() => handleFormat('fontSize', size.value)}
+                                                className="px-4 py-2 text-left text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-coral/10 hover:text-coral rounded-lg transition-colors flex items-center justify-between"
                                             >
-                                                <Check size={12} />
+                                                {size.label}
+                                                {size.value === '5' && <span className="text-[10px] bg-gray-100 dark:bg-gray-700 px-1.5 rounded text-gray-500">Lg</span>}
                                             </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Font Family Dropdown */}
+                            <div className="relative" ref={fontMenuRef}>
+                                <button
+                                    onClick={() => setIsFontFamilyMenuOpen(!isFontFamilyMenuOpen)}
+                                    title="Font Family"
+                                    className={`p-2.5 rounded-xl text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-1 ${isFontFamilyMenuOpen ? 'bg-white/50 dark:bg-white/10' : 'hover:bg-white/40 dark:hover:bg-black/20'}`}
+                                >
+                                    <Type size={18} />
+                                    <ChevronDown size={12} className={`transition-transform duration-200 ${isFontFamilyMenuOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isFontFamilyMenuOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-visible flex flex-col p-1 animate-fadeIn origin-top-left z-[60]">
+                                        {/* Predefined Fonts */}
+                                        {fontFamilies.map((font) => (
+                                            <button
+                                                key={font.label}
+                                                onClick={() => {
+                                                    document.execCommand('styleWithCSS', false, true);
+                                                    document.execCommand('fontName', false, font.value);
+                                                    document.execCommand('styleWithCSS', false, false);
+                                                    setIsFontFamilyMenuOpen(false);
+                                                    if (contentRef.current) setContent(contentRef.current.innerHTML);
+                                                }}
+                                                style={{ fontFamily: font.value === 'Satoshi' ? 'Satoshi, sans-serif' : font.value }}
+                                                className="px-4 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-coral/10 hover:text-coral rounded-lg transition-colors flex items-center justify-between"
+                                            >
+                                                {font.label}
+                                            </button>
+                                        ))}
+
+                                        <div className="h-px bg-gray-100 dark:bg-gray-700 my-1" />
+
+                                        {/* Custom URL Input Area */}
+                                        <div className="p-2">
+                                            <p className="text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider ml-1">Custom Font (URL)</p>
+                                            <div className="flex items-center gap-1 bg-gray-50 dark:bg-black/20 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+                                                <input
+                                                    type="text"
+                                                    placeholder="https://..."
+                                                    value={customFontUrl}
+                                                    onChange={(e) => setCustomFontUrl(e.target.value)}
+                                                    onKeyDown={(e) => e.key === 'Enter' && handleCustomFontLoad()}
+                                                    className="w-full px-2 py-1 text-xs bg-transparent border-none outline-none text-gray-700 dark:text-gray-300"
+                                                />
+                                                <button
+                                                    onClick={handleCustomFontLoad}
+                                                    disabled={!customFontUrl}
+                                                    className="p-1 rounded-md bg-white dark:bg-gray-700 text-coral disabled:opacity-50 shadow-sm hover:scale-105 transition-transform"
+                                                >
+                                                    <Check size={12} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
 
-                        <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
+                            <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
 
-                        <ToolbarButton icon={List} onClick={() => handleFormat('insertUnorderedList')} title="Bullet List" />
-                        <ToolbarButton icon={ListOrdered} onClick={() => handleFormat('insertOrderedList')} title="Numbered List" />
+                            <ToolbarButton icon={List} onClick={() => handleFormat('insertUnorderedList')} title="Bullet List" />
+                            <ToolbarButton icon={ListOrdered} onClick={() => handleFormat('insertOrderedList')} title="Numbered List" />
 
-                        <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
+                            <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
 
-                        <div className="relative" ref={linkModalRef}>
-                            <ToolbarButton icon={LinkIcon} onClick={() => handleFormat('createLink')} title="Insert Link" />
-                            {isLinkModalOpen && (
-                                <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-2 z-30 animate-fadeIn">
-                                    <input
-                                        type="text"
-                                        placeholder="Paste link URL..."
-                                        value={linkUrl}
-                                        autoFocus
-                                        onChange={(e) => setLinkUrl(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                confirmLink();
-                                            }
-                                        }}
-                                        className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-black/20 border-none outline-none text-sm text-gray-800 dark:text-gray-200 mb-2 focus:ring-2 focus:ring-coral/20"
-                                    />
-                                    <button
-                                        onClick={confirmLink}
-                                        className="w-full bg-coral text-white py-1.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity"
-                                    >
-                                        Insert Link
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                            <div className="relative" ref={linkModalRef}>
+                                <ToolbarButton icon={LinkIcon} onClick={() => handleFormat('createLink')} title="Insert Link" />
+                                {isLinkModalOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-2 z-30 animate-fadeIn">
+                                        <input
+                                            type="text"
+                                            placeholder="Paste link URL..."
+                                            value={linkUrl}
+                                            autoFocus
+                                            onChange={(e) => setLinkUrl(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    confirmLink();
+                                                }
+                                            }}
+                                            className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-black/20 border-none outline-none text-sm text-gray-800 dark:text-gray-200 mb-2 focus:ring-2 focus:ring-coral/20"
+                                        />
+                                        <button
+                                            onClick={confirmLink}
+                                            className="w-full bg-coral text-white py-1.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity"
+                                        >
+                                            Insert Link
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
-                        <ToolbarButton icon={TableIcon} onClick={() => handleFormat('insertTable')} title="Insert Table" />
+                            <ToolbarButton icon={TableIcon} onClick={() => handleFormat('insertTable')} title="Insert Table" />
 
-                        {/* Table Options Dropdown - Permanent but Disabled if no table selected or in Preview */}
-                        <div className="relative ml-2">
-                            <button
-                                onClick={() => !isPreview && isTableSelected && setIsTableOptionsOpen(!isTableOptionsOpen)}
-                                disabled={!isTableSelected || isPreview}
-                                className={`px-3 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-xs font-bold shadow-sm ${(!isPreview && isTableSelected)
-                                    ? 'bg-white/50 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 text-gray-800 dark:text-gray-100 cursor-pointer'
-                                    : 'bg-black/5 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60'
-                                    }`}
-                            >
-                                <Settings2 size={14} className={(!isPreview && isTableSelected) ? '' : 'opacity-50'} />
-                                Table Options
-                                <ChevronDown size={12} className={`transition-transform duration-200 ${isTableOptionsOpen ? 'rotate-180' : ''}`} />
-                            </button>
+                            {/* Table Options Dropdown - Permanent but Disabled if no table selected or in Preview */}
+                            <div className="relative ml-2">
+                                <button
+                                    onClick={() => !isPreview && isTableSelected && setIsTableOptionsOpen(!isTableOptionsOpen)}
+                                    disabled={!isTableSelected || isPreview}
+                                    className={`px-3 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-xs font-bold shadow-sm ${(!isPreview && isTableSelected)
+                                        ? 'bg-white/50 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 text-gray-800 dark:text-gray-100 cursor-pointer'
+                                        : 'bg-black/5 dark:bg-white/5 text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60'
+                                        }`}
+                                >
+                                    <Settings2 size={14} className={(!isPreview && isTableSelected) ? '' : 'opacity-50'} />
+                                    Table Options
+                                    <ChevronDown size={12} className={`transition-transform duration-200 ${isTableOptionsOpen ? 'rotate-180' : ''}`} />
+                                </button>
 
-                            {!isPreview && isTableSelected && isTableOptionsOpen && (
-                                <div className="absolute top-full left-0 mt-2 w-52 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-xl shadow-xl border border-white/20 dark:border-gray-700 overflow-hidden flex flex-col p-1 animate-fadeIn z-[50]">
-                                    <button onClick={() => modifyTable('addRow')} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors text-left">
-                                        <Plus size={14} className="text-gray-500" /> Add Row
-                                    </button>
-                                    <button onClick={() => modifyTable('addCol')} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors text-left">
-                                        <Plus size={14} className="text-gray-500" /> Add Column
-                                    </button>
-                                    <div className="h-px bg-gray-400/20 my-1" />
-                                    <button onClick={() => modifyTable('deleteRow')} className="flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-left">
-                                        <Trash2 size={14} /> Delete Row
-                                    </button>
-                                    <button onClick={() => modifyTable('deleteCol')} className="flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-left">
-                                        <Trash2 size={14} /> Delete Column
-                                    </button>
-                                    <div className="h-px bg-gray-400/20 my-1" />
-                                    <button onClick={() => modifyTable('deleteTable')} className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors text-left">
-                                        <Trash2 size={14} strokeWidth={2.5} /> Delete Table
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                                {!isPreview && isTableSelected && isTableOptionsOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-52 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-xl shadow-xl border border-white/20 dark:border-gray-700 overflow-hidden flex flex-col p-1 animate-fadeIn z-[50]">
+                                        <button onClick={() => modifyTable('addRow')} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors text-left">
+                                            <Plus size={14} className="text-gray-500" /> Add Row
+                                        </button>
+                                        <button onClick={() => modifyTable('addCol')} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors text-left">
+                                            <Plus size={14} className="text-gray-500" /> Add Column
+                                        </button>
+                                        <div className="h-px bg-gray-400/20 my-1" />
+                                        <button onClick={() => modifyTable('deleteRow')} className="flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-left">
+                                            <Trash2 size={14} /> Delete Row
+                                        </button>
+                                        <button onClick={() => modifyTable('deleteCol')} className="flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-left">
+                                            <Trash2 size={14} /> Delete Column
+                                        </button>
+                                        <div className="h-px bg-gray-400/20 my-1" />
+                                        <button onClick={() => modifyTable('deleteTable')} className="flex items-center gap-3 px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors text-left">
+                                            <Trash2 size={14} strokeWidth={2.5} /> Delete Table
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
-                        <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
+                            <div className="w-px h-5 bg-gray-400/30 mx-2 self-center" />
 
-                        <ToolbarButton
-                            icon={isPreview ? EyeOff : Eye}
-                            onClick={() => setIsPreview(!isPreview)}
-                            title={isPreview ? "Edit Mode" : "Preview Mode (LaTeX)"}
-                        />
-                    </div>
-
-                    <div className="hidden sm:block flex-1" />
-
-                    {/* Color Swatches */}
-                    <div className="flex items-center gap-2 bg-white/30 dark:bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm px-3 shadow-sm border border-white/10 relative z-10">
-                        <Palette size={16} className="text-gray-500 dark:text-gray-200 mr-1" />
-                        {colors.map((c) => (
-                            <button
-                                key={c.id}
-                                onClick={() => setSelectedColor(c.id)}
-                                title={c.id.charAt(0).toUpperCase() + c.id.slice(1)}
-                                className={`w-6 h-6 rounded-full transition-transform duration-200 border border-white/20 shadow-sm ${c.bg} ${selectedColor === c.id ? 'scale-125 ring-2 ring-gray-900/20 dark:ring-white/50' : 'hover:scale-110'
-                                    }`}
+                            <ToolbarButton
+                                icon={isPreview ? EyeOff : Eye}
+                                onClick={() => setIsPreview(!isPreview)}
+                                title={isPreview ? "Edit Mode" : "Preview Mode (LaTeX)"}
                             />
-                        ))}
+                        </div>
+
+                        <div className="hidden sm:block flex-1" />
+
+                        {/* Color Swatches */}
+                        <div className="flex items-center gap-2 bg-white/30 dark:bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm px-3 shadow-sm border border-white/10 relative z-10">
+                            <Palette size={16} className="text-gray-500 dark:text-gray-200 mr-1" />
+                            {colors.map((c) => (
+                                <button
+                                    key={c.id}
+                                    onClick={() => setSelectedColor(c.id)}
+                                    title={c.id.charAt(0).toUpperCase() + c.id.slice(1)}
+                                    className={`w-6 h-6 rounded-full transition-transform duration-200 border border-white/20 shadow-sm ${c.bg} ${selectedColor === c.id ? 'scale-125 ring-2 ring-gray-900/20 dark:ring-white/50' : 'hover:scale-110'
+                                        }`}
+                                />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Editor Content */}
                 <div className="flex-1 px-10 py-6 overflow-y-auto custom-scrollbar relative z-0">
                     <div
                         ref={contentRef}
-                        contentEditable={!isPreview}
+                        contentEditable={!isPreview && !readOnly}
                         className={`outline-none text-lg text-gray-800 dark:text-gray-200 leading-8 font-medium editor-content h-full focus-visible:ring-0 focus-visible:ring-offset-0 ${isPreview ? 'pointer-events-none' : ''}`}
                         onInput={(e) => {
                             if (!isPreview) setContent(e.currentTarget.innerHTML);
@@ -624,49 +627,51 @@ export const Editor = ({ note, onClose, onSave, folders, currentAccent }) => {
                 </div>
 
                 {/* Footer Controls */}
-                <div className="p-6 flex items-center justify-between border-t border-black/5 dark:border-white/5 bg-white/10 dark:bg-black/10 backdrop-blur-md relative z-20">
+                {!readOnly && (
+                    <div className="p-6 flex items-center justify-between border-t border-black/5 dark:border-white/5 bg-white/10 dark:bg-black/10 backdrop-blur-md relative z-20">
 
-                    {/* Custom Folder Select */}
-                    <div className="relative" ref={folderRef}>
-                        <button
-                            onClick={() => setIsFolderOpen(!isFolderOpen)}
-                            className="bg-white/50 dark:bg-black/20 hover:bg-white/80 dark:hover:bg-black/40 text-gray-800 dark:text-white pl-4 pr-3 py-3 rounded-2xl text-sm font-bold shadow-sm outline-none cursor-pointer transition-all flex items-center gap-3 border border-white/20 min-w-[180px] justify-between group"
-                        >
-                            <span className="flex items-center gap-2 truncate">
-                                <Folder size={16} className="text-gray-500 dark:text-gray-400 group-hover:text-coral transition-colors" />
-                                {activeFolder?.name || 'Uncategorized'}
-                            </span>
-                            <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isFolderOpen ? 'rotate-180' : ''}`} />
-                        </button>
+                        {/* Custom Folder Select */}
+                        <div className="relative" ref={folderRef}>
+                            <button
+                                onClick={() => setIsFolderOpen(!isFolderOpen)}
+                                className="bg-white/50 dark:bg-black/20 hover:bg-white/80 dark:hover:bg-black/40 text-gray-800 dark:text-white pl-4 pr-3 py-3 rounded-2xl text-sm font-bold shadow-sm outline-none cursor-pointer transition-all flex items-center gap-3 border border-white/20 min-w-[180px] justify-between group"
+                            >
+                                <span className="flex items-center gap-2 truncate">
+                                    <Folder size={16} className="text-gray-500 dark:text-gray-400 group-hover:text-coral transition-colors" />
+                                    {activeFolder?.name || 'Uncategorized'}
+                                </span>
+                                <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isFolderOpen ? 'rotate-180' : ''}`} />
+                            </button>
 
-                        {isFolderOpen && (
-                            <div className="absolute bottom-full left-0 mb-2 w-64 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col p-1 animate-fadeIn origin-bottom-left max-h-60 overflow-y-auto custom-scrollbar z-[60]">
-                                <div className="px-3 py-2 text-xs font-black text-gray-400 uppercase tracking-widest">
-                                    Move to Stack
+                            {isFolderOpen && (
+                                <div className="absolute bottom-full left-0 mb-2 w-64 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col p-1 animate-fadeIn origin-bottom-left max-h-60 overflow-y-auto custom-scrollbar z-[60]">
+                                    <div className="px-3 py-2 text-xs font-black text-gray-400 uppercase tracking-widest">
+                                        Move to Stack
+                                    </div>
+                                    {folders.map(f => (
+                                        <button
+                                            key={f.id}
+                                            onClick={() => { setSelectedFolderId(f.id); setIsFolderOpen(false); }}
+                                            className={`px-3 py-2.5 rounded-xl text-left text-sm font-bold flex items-center gap-3 transition-colors ${selectedFolderId === f.id ? 'bg-coral/10 text-coral' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                                        >
+                                            <Hash size={14} className={selectedFolderId === f.id ? 'text-coral' : 'text-gray-400'} />
+                                            {f.name}
+                                            {selectedFolderId === f.id && <Check size={14} className="ml-auto" />}
+                                        </button>
+                                    ))}
                                 </div>
-                                {folders.map(f => (
-                                    <button
-                                        key={f.id}
-                                        onClick={() => { setSelectedFolderId(f.id); setIsFolderOpen(false); }}
-                                        className={`px-3 py-2.5 rounded-xl text-left text-sm font-bold flex items-center gap-3 transition-colors ${selectedFolderId === f.id ? 'bg-coral/10 text-coral' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'}`}
-                                    >
-                                        <Hash size={14} className={selectedFolderId === f.id ? 'text-coral' : 'text-gray-400'} />
-                                        {f.name}
-                                        {selectedFolderId === f.id && <Check size={14} className="ml-auto" />}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
 
-                    <button
-                        onClick={handleSave}
-                        className="bg-gray-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-[18px] font-bold text-sm flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-gray-900/10 dark:shadow-none"
-                    >
-                        <Check size={18} strokeWidth={3} />
-                        Save Note
-                    </button>
-                </div>
+                        <button
+                            onClick={handleSave}
+                            className="bg-gray-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-[18px] font-bold text-sm flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-gray-900/10 dark:shadow-none"
+                        >
+                            <Check size={18} strokeWidth={3} />
+                            Save Note
+                        </button>
+                    </div>
+                )}
             </motion.div>
         </motion.div>
     );

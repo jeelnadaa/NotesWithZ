@@ -9,7 +9,7 @@ const stripHtml = (html) => {
     return tmp.textContent || tmp.innerText || "";
 };
 
-export function NoteCard({ note, onClick, onDelete, onArchive, onUnarchive, onAddToStack, className }) {
+export function NoteCard({ note, onClick, onDelete, onArchive, onUnarchive, onAddToStack, onRestore, isTrash, className }) {
     const theme = colors.find(c => c.id === note.color);
     const bgClass = theme ? theme.bg : 'bg-white dark:bg-[#1A1A1A]';
     const borderClass = theme ? theme.border : 'border-transparent';
@@ -37,42 +37,61 @@ export function NoteCard({ note, onClick, onDelete, onArchive, onUnarchive, onAd
                     {format(new Date(note.date), 'MMM d, h:mm a')}
                 </span>
                 <div className="flex gap-2 transition-opacity duration-300">
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onAddToStack(note.id); }}
-                        className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full text-gray-400 hover:text-purple-500 transition-colors"
-                        title="Add to Stack"
-                    >
-                        <FolderInput size={16} />
-                    </button>
-                    {note.isArchived ? (
+                    {!isTrash && (
                         <button
-                            onClick={(e) => { e.stopPropagation(); onUnarchive(note.id); }}
+                            onClick={(e) => { e.stopPropagation(); onAddToStack(note.id); }}
+                            className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full text-gray-400 hover:text-purple-500 transition-colors"
+                            title="Add to Stack"
+                        >
+                            <FolderInput size={16} />
+                        </button>
+                    )}
+
+                    {isTrash ? (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onRestore(note.id); }}
                             className="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-full text-gray-400 hover:text-green-500 transition-colors"
-                            title="Unarchive"
+                            title="Restore"
                         >
                             <ArchiveRestore size={16} />
                         </button>
                     ) : (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onArchive(note.id); }}
-                            className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full text-gray-400 hover:text-blue-500 transition-colors"
-                            title="Archive"
-                        >
-                            <Archive size={16} />
-                        </button>
+                        note.isArchived ? (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onUnarchive(note.id); }}
+                                className="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-full text-gray-400 hover:text-green-500 transition-colors"
+                                title="Unarchive"
+                            >
+                                <ArchiveRestore size={16} />
+                            </button>
+                        ) : (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onArchive(note.id); }}
+                                className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full text-gray-400 hover:text-blue-500 transition-colors"
+                                title="Archive"
+                            >
+                                <Archive size={16} />
+                            </button>
+                        )
                     )}
+
                     <button
                         onClick={(e) => { e.stopPropagation(); onDelete(note.id); }}
-                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full text-gray-400 hover:text-red-500 transition-colors"
-                        title="Delete"
+                        className={`p-2 rounded-full transition-colors ${isTrash
+                            ? 'bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40'
+                            : 'hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-500'}`}
+                        title={isTrash ? "Delete Forever" : "Delete"}
                     >
                         <Trash2 size={16} />
                     </button>
-                    <button
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800/50 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                    >
-                        <Edit2 size={16} />
-                    </button>
+                    {!isTrash && (
+                        <button
+                            onClick={onClick}
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800/50 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        >
+                            <Edit2 size={16} />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

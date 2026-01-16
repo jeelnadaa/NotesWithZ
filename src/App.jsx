@@ -17,7 +17,7 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { getThemeContent } from './utils/themeContent';
 
 function App() {
-  const { notes, folders, addNote, updateNote, deleteNote, archiveNote, unarchiveNote, addFolder, deleteFolder, convertAllNotesToColor } = useNotes();
+  const { notes, folders, addNote, updateNote, deleteNote, permanentlyDeleteNote, restoreNote, archiveNote, unarchiveNote, addFolder, deleteFolder, convertAllNotesToColor } = useNotes();
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   // dateFilter state
   const [dateFilter, setDateFilter] = useState(() => {
@@ -173,6 +173,13 @@ function App() {
       const q = searchQuery.toLowerCase();
       return note.title.toLowerCase().includes(q) || note.content.toLowerCase().includes(q);
     }
+
+    // Trash View
+    if (selectedFolderId === 'TRASH') return note.isDeleted;
+
+    // Normal Views (Exclude deleted)
+    if (note.isDeleted) return false;
+
     if (selectedFolderId === 'ARCHIVE') return note.isArchived;
     if (note.isArchived) return false;
     if (selectedFolderId) return note.folderId === selectedFolderId;
@@ -226,7 +233,23 @@ function App() {
       cancelText: content.deleteNoteCancel,
       onConfirm: () => {
         deleteNote(id);
-        addToast(content.toastDeleted, 'delete');
+        addToast(content.toastSoftDeleted, 'delete');
+        setModalOpen(false);
+      }
+    });
+    setModalOpen(true);
+  };
+
+  const confirmPermanentDelete = (id) => {
+    setIsInfoModal(false);
+    setModalConfig({
+      title: content.permDeleteNoteTitle,
+      message: content.permDeleteNoteMsg,
+      confirmText: content.permDeleteNoteConfirm,
+      cancelText: content.permDeleteNoteCancel,
+      onConfirm: () => {
+        permanentlyDeleteNote(id);
+        addToast(content.toastPermanentlyDeleted, 'delete');
         setModalOpen(false);
       }
     });
@@ -264,6 +287,7 @@ function App() {
   const getPageTitle = () => {
     if (searchQuery) return `Vibe check: "${searchQuery}"`;
     if (selectedFolderId === 'ARCHIVE') return content.vault;
+    if (selectedFolderId === 'TRASH') return content.trash;
     if (selectedFolderId) return folders.find(f => f.id === selectedFolderId)?.name || 'Stack';
     return content.stash;
   };
@@ -353,7 +377,7 @@ function App() {
                 {selectedFolderId === 'ARCHIVE' ? content.vault : (selectedFolderId ? folders.find(f => f.id === selectedFolderId)?.name : content.stash)}
               </h2>
               <p className="text-gray-400 font-bold text-sm">
-                {selectedFolderId === 'ARCHIVE' ? content.vaultSubtitle : (selectedFolderId ? content.folderSubtitle : content.stashSubtitle)}
+                {selectedFolderId === 'ARCHIVE' ? content.vaultSubtitle : (selectedFolderId === 'TRASH' ? content.trashSubtitle : (selectedFolderId ? content.folderSubtitle : content.stashSubtitle))}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -392,11 +416,14 @@ function App() {
                 >
                   <NoteCard
                     note={note}
+                    isTrash={selectedFolderId === 'TRASH'}
                     onClick={() => handleEditNote(note)}
-                    onDelete={confirmDeleteNote}
+                    onDelete={selectedFolderId === 'TRASH' ? confirmPermanentDelete : confirmDeleteNote}
+                    onRestore={(id) => { restoreNote(id); addToast(content.toastRestored, 'success'); }}
                     onArchive={(id) => { archiveNote(id); addToast(content.toastArchived, 'info'); }}
                     onUnarchive={(id) => { unarchiveNote(id); addToast(content.toastUnarchived, 'success'); }}
                     onAddToStack={() => setMoveNote(note)}
+                    onUpdate={updateNote}
                     className="w-full"
                   />
                 </motion.div>
@@ -415,6 +442,7 @@ function App() {
             onClose={() => setIsEditorOpen(false)}
             onSave={handleSaveNote}
             currentAccent={currentAccent}
+            readOnly={selectedFolderId === 'TRASH'}
           />
         )}
       </AnimatePresence>
@@ -470,6 +498,7 @@ function App() {
             onMove={handleMoveNote}
             folders={folders}
             currentFolderId={moveNote.folderId}
+            currentAccent={currentAccent}
           />
         )}
       </AnimatePresence>
