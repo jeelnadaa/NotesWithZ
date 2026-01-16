@@ -67,6 +67,18 @@ export const themeContent = {
         toastMoved: "Moved to",
         toastStackCreated: "Stack created! 📚",
         toastStackNuked: "Stack destroyed 💥",
+
+        // Password Modal
+        pwdTitleSet: "Lock the Vault 🔒",
+        pwdSubtitleSet: "Set a 4-digit code so no one snoops.",
+        pwdTitleUnlock: "Vibe Check 🔐",
+        pwdSubtitleUnlock: "Prove it's you, bestie.",
+        pwdPlaceholder: "0 0 0 0",
+        pwdConfirm: "Lock It",
+        pwdUnlock: "Unlock",
+        pwdCancel: "Nevermind",
+        pwdError: "Wrong vibe. Try again. 🚩",
+        pwdMismatch: "Passcodes don't match! 😵‍💫",
     },
     blue: {
         // Sidebar
@@ -133,9 +145,20 @@ export const themeContent = {
         fontLoadError: "Connection failed. Check vector path.",
 
         // Stack Modal
-        stackModalTitle: "New Sector",
         stackModalPlaceholder: "Sector Name",
-        createStackBtn: "Establish Sector"
+        createStackBtn: "Establish Sector",
+
+        // Password Modal
+        pwdTitleSet: "Secure Sector 🛡️",
+        pwdSubtitleSet: "Establish 4-digit security protocol.",
+        pwdTitleUnlock: "Identity Verification 🆔",
+        pwdSubtitleUnlock: "Credentials required for access.",
+        pwdPlaceholder: "0 0 0 0",
+        pwdConfirm: "Encrypt",
+        pwdUnlock: "Authenticate",
+        pwdCancel: "Abort",
+        pwdError: "Access Denied. 🚫",
+        pwdMismatch: "Protocol Mismatch. ⚠️",
     },
     uncle: {
         // Sidebar
@@ -202,7 +225,19 @@ export const themeContent = {
         // Stack Modal
         stackModalTitle: "New Folder",
         stackModalPlaceholder: "Folder Name",
-        createStackBtn: "Create Folder"
+        createStackBtn: "Create Folder",
+
+        // Password Modal
+        pwdTitleSet: "Set Password",
+        pwdSubtitleSet: "Create a 4-digit PIN to secure your archives.",
+        pwdTitleUnlock: "Enter Password",
+        pwdSubtitleUnlock: "Please enter your PIN into the field below.",
+        pwdPlaceholder: "0 0 0 0",
+        pwdConfirm: "Set Password",
+        pwdUnlock: "Unlock",
+        pwdCancel: "Cancel",
+        pwdError: "Incorrect password. Please try again.",
+        pwdMismatch: "Passwords do not match.",
     }
 };
 

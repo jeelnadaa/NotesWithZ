@@ -15,9 +15,11 @@ import { CommandPalette } from './components/CommandPalette';
 import { AddToStackModal } from './components/AddToStackModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { getThemeContent } from './utils/themeContent';
+import { PasswordModal } from './components/PasswordModal';
+import { hashPassword, verifyPassword } from './utils/security';
 
 function App() {
-  const { notes, folders, addNote, updateNote, deleteNote, permanentlyDeleteNote, restoreNote, archiveNote, unarchiveNote, addFolder, deleteFolder, convertAllNotesToColor } = useNotes();
+  const { notes, folders, addNote, updateNote, deleteNote, permanentlyDeleteNote, restoreNote, archiveNote, unarchiveNote, addFolder, deleteFolder, convertAllNotesToColor, archivePassword, setArchivePassword } = useNotes();
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   // dateFilter state
   const [dateFilter, setDateFilter] = useState(() => {
@@ -153,6 +155,15 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState({ title: '', message: '', onConfirm: () => { }, confirmText: '', cancelText: '' });
   const [isInfoModal, setIsInfoModal] = useState(false);
+
+  // Security State
+  const [isArchiveUnlocked, setIsArchiveUnlocked] = useState(false);
+  const [passwordModal, setPasswordModal] = useState({ isOpen: false, mode: 'unlock', onSuccess: () => { } });
+
+  const handlePasswordSuccess = (pin) => {
+    // This is called by the modal when it succeeds (either returns pin or just success bool)
+    // We'll handle the logic in the specific caller, but this is a placeholder if needed.
+  };
 
   // Keyboard Shortcuts
   useEffect(() => {
@@ -345,7 +356,51 @@ function App() {
         folders={folders}
         onCreateNote={handleCreateNote}
         selectedFolder={selectedFolderId}
-        onSelectFolder={(id) => { setSelectedFolderId(id); setIsSidebarOpen(false); }}
+        onSelectFolder={(id) => {
+          if (id === 'ARCHIVE') {
+            // Check if password exists
+            if (!archivePassword) {
+              // Set Password First
+              setPasswordModal({
+                isOpen: true,
+                mode: 'set',
+                onSuccess: async (pin) => {
+                  const hash = await hashPassword(pin);
+                  setArchivePassword(hash);
+                  setIsArchiveUnlocked(true);
+                  setSelectedFolderId('ARCHIVE');
+                  setIsSidebarOpen(false);
+                  addToast("Vault Locked & Loaded 🔒", 'success');
+                }
+              });
+            } else if (!isArchiveUnlocked) {
+              // Unlock
+              setPasswordModal({
+                isOpen: true,
+                mode: 'unlock',
+                onSuccess: async (pin) => {
+                  const isValid = await verifyPassword(pin, archivePassword);
+                  if (isValid) {
+                    setIsArchiveUnlocked(true);
+                    setSelectedFolderId('ARCHIVE');
+                    setIsSidebarOpen(false);
+                    return true;
+                  }
+                  return false;
+                }
+              });
+            } else {
+              // Already unlocked
+              setSelectedFolderId('ARCHIVE');
+              setIsSidebarOpen(false);
+            }
+          } else {
+            // Normal Folder
+            if (id !== 'ARCHIVE') setIsArchiveUnlocked(false); // Relock when leaving ?? logic choice. User asked "everytime wants to open". So yes.
+            setSelectedFolderId(id);
+            setIsSidebarOpen(false);
+          }
+        }}
         onAddFolder={addFolder}
         onDeleteFolder={confirmDeleteFolder}
         searchQuery={searchQuery}
@@ -420,7 +475,24 @@ function App() {
                     onClick={() => handleEditNote(note)}
                     onDelete={selectedFolderId === 'TRASH' ? confirmPermanentDelete : confirmDeleteNote}
                     onRestore={(id) => { restoreNote(id); addToast(content.toastRestored, 'success'); }}
-                    onArchive={(id) => { archiveNote(id); addToast(content.toastArchived, 'info'); }}
+                    onArchive={(id) => {
+                      if (!archivePassword) {
+                        setPasswordModal({
+                          isOpen: true,
+                          mode: 'set',
+                          onSuccess: async (pin) => {
+                            const hash = await hashPassword(pin);
+                            setArchivePassword(hash);
+                            setIsArchiveUnlocked(true);
+                            archiveNote(id);
+                            addToast(content.toastArchived, 'info');
+                          }
+                        });
+                      } else {
+                        archiveNote(id);
+                        addToast(content.toastArchived, 'info');
+                      }
+                    }}
                     onUnarchive={(id) => { unarchiveNote(id); addToast(content.toastUnarchived, 'success'); }}
                     onAddToStack={() => setMoveNote(note)}
                     onUpdate={updateNote}
@@ -506,6 +578,18 @@ function App() {
       <AnimatePresence>
         {showOnboarding && (
           <OnboardingModal onSelect={handleOnboardingSelect} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {passwordModal.isOpen && (
+          <PasswordModal
+            isOpen={passwordModal.isOpen}
+            onClose={() => setPasswordModal(prev => ({ ...prev, isOpen: false }))}
+            onSuccess={passwordModal.onSuccess}
+            mode={passwordModal.mode}
+            currentAccent={currentAccent}
+          />
         )}
       </AnimatePresence>
 

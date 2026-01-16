@@ -90,9 +90,25 @@ export function useNotes() {
             // Force reset for this update
             return INITIAL_NOTES;
         }
-        const saved = localStorage.getItem(STORAGE_KEYS.NOTES);
         return saved ? JSON.parse(saved) : INITIAL_NOTES;
     });
+
+    const [archivePassword, setArchivePassword] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('archivePassword') || null;
+        }
+        return null;
+    });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            if (archivePassword) {
+                localStorage.setItem('archivePassword', archivePassword);
+            } else {
+                localStorage.removeItem('archivePassword');
+            }
+        }
+    }, [archivePassword]);
 
     // Mark as seeded on mount
     useEffect(() => {
@@ -189,6 +205,8 @@ export function useNotes() {
         unarchiveNote,
         addFolder,
         deleteFolder,
-        convertAllNotesToColor
+        convertAllNotesToColor,
+        archivePassword,
+        setArchivePassword
     };
 }
