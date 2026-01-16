@@ -74,11 +74,12 @@ export const themeContent = {
         pwdTitleUnlock: "Vibe Check 🔐",
         pwdSubtitleUnlock: "Prove it's you, bestie.",
         pwdPlaceholder: "0 0 0 0",
-        pwdConfirm: "Lock It",
-        pwdUnlock: "Unlock",
+        pwdConfirm: "Gatekeep It 💅",
+        pwdUnlock: "Let Me In 😤",
         pwdCancel: "Nevermind",
         pwdError: "Wrong vibe. Try again. 🚩",
         pwdMismatch: "Bestie, the math ain't mathing. 🤡",
+        pwdIncomplete: "Bestie, don't leave me hanging. 4 digits! 💅",
     },
     blue: {
         // Sidebar
@@ -126,7 +127,6 @@ export const themeContent = {
         deleteFolderCancel: "Hold fire",
 
         // Modals - Info
-        // Modals - Info
         infoTitle: "System Intel 💾",
         infoMsg: "Yo Bro, Intel Update ⚠️\n\nData is stored locally (browser cache). Wiping cache = nuking intel. Zero cloud, 100% private.\n\n(hidden unlock: vibe coded by Jeel Nada. stay icy 🧊)",
         infoConfirm: "Copy That",
@@ -159,6 +159,7 @@ export const themeContent = {
         pwdCancel: "Abort",
         pwdError: "Access Denied. 🚫",
         pwdMismatch: "Protocol Mismatch. ⚠️",
+        pwdIncomplete: "Full encryption required. 4 digits. 🛑",
     },
     uncle: {
         // Sidebar
@@ -238,6 +239,7 @@ export const themeContent = {
         pwdCancel: "Cancel",
         pwdError: "Incorrect password. Please try again.",
         pwdMismatch: "Passwords do not match.",
+        pwdIncomplete: "Please enter all 4 digits.",
     }
 };
 

@@ -11,33 +11,62 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
     const inputRefs = useRef([]);
     const confirmInputRefs = useRef([]);
 
-    // Reset state when opening
+    // Reset state upon opening
     useEffect(() => {
         if (isOpen) {
             setPin(['', '', '', '']);
             setConfirmPin(['', '', '', '']);
             setStep(mode === 'set' ? 'create' : 'enter');
             setError('');
-            // Focus first input after animation
+            // Focus first input
             setTimeout(() => {
-                inputRefs.current[0]?.focus();
+                const refs = mode === 'set' ? inputRefs : inputRefs; // simplify focus logic
+                // For create step, we focus inputRefs
+                // For enter step, we focus inputRefs
+                if (inputRefs.current[0]) inputRefs.current[0].focus();
             }, 300);
-
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') onClose();
-            };
-            window.addEventListener('keydown', handleEscape);
-            return () => window.removeEventListener('keydown', handleEscape);
         }
-    }, [isOpen, mode, onClose]);
+    }, [isOpen, mode]);
+
+    // Handle Escape Key (Only when open)
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, [isOpen, onClose]);
 
     const content = getThemeContent(currentAccent);
 
+    // Get color theme
+    const getColors = () => {
+        if (currentAccent === 'uncle') return {
+            bg: 'bg-white dark:bg-gray-900',
+            text: 'text-gray-900 dark:text-white',
+            accent: 'bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black',
+        };
+        if (currentAccent === 'blue') return {
+            bg: 'bg-blue-50 dark:bg-[#0f1722]',
+            text: 'text-gray-900 dark:text-white',
+            accent: 'bg-blue-500 hover:bg-blue-600 text-white',
+            ring: 'focus:ring-blue-500'
+        };
+        return {
+            bg: 'bg-[#fff5f7] dark:bg-[#1a0f12]',
+            text: 'text-gray-900 dark:text-white',
+            accent: 'bg-coral hover:bg-coral-hover text-white',
+            ring: 'focus:ring-coral'
+        };
+    };
+
+    const colors = getColors();
+
     const handleInput = (index, value, isConfirm = false) => {
         if (!/^\d*$/.test(value)) return;
-
         const newPin = isConfirm ? [...confirmPin] : [...pin];
-        newPin[index] = value.slice(-1); // Only take last char
+        newPin[index] = value.slice(-1);
 
         if (isConfirm) setConfirmPin(newPin);
         else setPin(newPin);
@@ -45,31 +74,35 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
 
         // Auto-advance
         if (value && index < 3) {
-            const nextInput = isConfirm ? confirmInputRefs.current[index + 1] : inputRefs.current[index + 1];
-            nextInput?.focus();
-        }
-    };
-
-    const handleKeyDown = (index, e, isConfirm = false) => {
-        if (e.key === 'Backspace' && !(isConfirm ? confirmPin[index] : pin[index]) && index > 0) {
-            const prevInput = isConfirm ? confirmInputRefs.current[index - 1] : inputRefs.current[index - 1];
-            prevInput?.focus();
+            const refs = isConfirm ? confirmInputRefs : inputRefs;
+            if (refs.current[index + 1]) refs.current[index + 1].focus();
         }
     };
 
     const handleSubmit = async () => {
         if (step === 'create') {
-            if (pin.some(d => d === '')) return;
+            if (pin.some(d => d === '')) {
+                setError(content.pwdIncomplete);
+                return;
+            }
             setStep('confirm');
-            setTimeout(() => confirmInputRefs.current[0]?.focus(), 100);
+            setTimeout(() => {
+                if (confirmInputRefs.current[0]) confirmInputRefs.current[0].focus();
+            }, 100);
             return;
         }
 
         if (step === 'confirm') {
+            if (confirmPin.some(d => d === '')) {
+                setError(content.pwdIncomplete);
+                return;
+            }
             if (pin.join('') !== confirmPin.join('') && confirmPin.join('').length === 4) {
                 setError(content.pwdMismatch);
                 setConfirmPin(['', '', '', '']);
-                confirmInputRefs.current[0]?.focus();
+                setTimeout(() => {
+                    if (confirmInputRefs.current[0]) confirmInputRefs.current[0].focus();
+                }, 100);
                 return;
             }
             if (pin.join('') === confirmPin.join('')) {
@@ -80,57 +113,30 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
         }
 
         if (step === 'enter') {
+            if (pin.some(d => d === '')) {
+                setError(content.pwdIncomplete);
+                return;
+            }
             const result = await onSuccess(pin.join(''));
             if (!result) {
                 setError(content.pwdError);
                 setPin(['', '', '', '']);
-                inputRefs.current[0]?.focus();
+                if (inputRefs.current[0]) inputRefs.current[0].focus();
             } else {
                 onClose();
             }
         }
     };
 
-    // Auto-submit when 4 digits filled
-    useEffect(() => {
-        if (step === 'create' && pin.every(d => d !== '')) {
-            // Wait a beat before moving to confirm
-            const timer = setTimeout(handleSubmit, 300);
-            return () => clearTimeout(timer);
+    const handleKeyDown = (index, e, isConfirm = false) => {
+        if (e.key === 'Backspace' && !(isConfirm ? confirmPin[index] : pin[index]) && index > 0) {
+            const refs = isConfirm ? confirmInputRefs : inputRefs;
+            if (refs.current[index - 1]) refs.current[index - 1].focus();
         }
-        if (step === 'confirm' && confirmPin.every(d => d !== '')) {
-            const timer = setTimeout(handleSubmit, 300);
-            return () => clearTimeout(timer);
+        if (e.key === 'Enter') {
+            handleSubmit();
         }
-        if (step === 'enter' && pin.every(d => d !== '')) {
-            const timer = setTimeout(handleSubmit, 300);
-            return () => clearTimeout(timer);
-        }
-    }, [pin, confirmPin, step]);
-
-    // Theme Colors
-    const getColors = () => {
-        if (currentAccent === 'uncle') return {
-            bg: 'bg-white dark:bg-gray-900',
-            text: 'text-gray-900 dark:text-white',
-            accent: 'bg-gray-900 dark:bg-white text-white dark:text-black',
-            ring: 'focus:ring-gray-900 dark:focus:ring-white'
-        };
-        if (currentAccent === 'blue') return {
-            bg: 'bg-blue-50 dark:bg-[#0f1722]',
-            text: 'text-gray-900 dark:text-white',
-            accent: 'bg-blue-500 text-white',
-            ring: 'focus:ring-blue-500'
-        };
-        return {
-            bg: 'bg-[#fff5f7] dark:bg-[#1a0f12]',
-            text: 'text-gray-900 dark:text-white',
-            accent: 'bg-coral text-white',
-            ring: 'focus:ring-coral'
-        };
     };
-
-    const colors = getColors();
 
     const title = step === 'create' || step === 'confirm' ? content.pwdTitleSet : content.pwdTitleUnlock;
     const subtitle = step === 'create' ? content.pwdSubtitleSet : (step === 'confirm' ? "Confirm your PIN" : content.pwdSubtitleUnlock);
@@ -150,10 +156,9 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         className={`relative w-full max-w-sm ${colors.bg} rounded-[32px] p-8 shadow-2xl border border-white/20`}
                     >
-                        {/* Close button */}
                         <button
                             onClick={onClose}
                             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
@@ -208,6 +213,16 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
                                     </motion.p>
                                 )}
                             </AnimatePresence>
+
+                            {/* Submit Button */}
+                            <button
+                                onClick={handleSubmit}
+                                className={`w-full py-3 rounded-2xl font-bold text-lg transition-all transform active:scale-95
+                                    ${colors.accent} shadow-lg hover:shadow-xl
+                                `}
+                            >
+                                {step === 'create' ? content.pwdConfirm : (step === 'confirm' ? content.pwdConfirm : content.pwdUnlock)}
+                            </button>
                         </div>
                     </motion.div>
                 </div>
