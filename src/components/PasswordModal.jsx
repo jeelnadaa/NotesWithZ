@@ -22,8 +22,14 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
             setTimeout(() => {
                 inputRefs.current[0]?.focus();
             }, 300);
+
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') onClose();
+            };
+            window.addEventListener('keydown', handleEscape);
+            return () => window.removeEventListener('keydown', handleEscape);
         }
-    }, [isOpen, mode]);
+    }, [isOpen, mode, onClose]);
 
     const content = getThemeContent(currentAccent);
 
@@ -51,7 +57,7 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (step === 'create') {
             if (pin.some(d => d === '')) return;
             setStep('confirm');
@@ -74,7 +80,7 @@ export const PasswordModal = ({ isOpen, onClose, onSuccess, mode = 'unlock', cur
         }
 
         if (step === 'enter') {
-            const result = onSuccess(pin.join(''));
+            const result = await onSuccess(pin.join(''));
             if (!result) {
                 setError(content.pwdError);
                 setPin(['', '', '', '']);

@@ -90,6 +90,7 @@ export function useNotes() {
             // Force reset for this update
             return INITIAL_NOTES;
         }
+        const saved = localStorage.getItem(STORAGE_KEYS.NOTES);
         return saved ? JSON.parse(saved) : INITIAL_NOTES;
     });
 

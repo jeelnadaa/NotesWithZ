@@ -78,7 +78,7 @@ export const themeContent = {
         pwdUnlock: "Unlock",
         pwdCancel: "Nevermind",
         pwdError: "Wrong vibe. Try again. 🚩",
-        pwdMismatch: "Passcodes don't match! 😵‍💫",
+        pwdMismatch: "Bestie, the math ain't mathing. 🤡",
     },
     blue: {
         // Sidebar
