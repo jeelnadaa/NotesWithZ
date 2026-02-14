@@ -145,6 +145,7 @@ export const themeContent = {
         fontLoadError: "Connection failed. Check vector path.",
 
         // Stack Modal
+        stackModalTitle: "New Sector",
         stackModalPlaceholder: "Sector Name",
         createStackBtn: "Establish Sector",
 
