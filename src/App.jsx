@@ -558,7 +558,7 @@ function App() {
                 addToast(content.toastStackCreated, 'success');
               } else {
                 renameFolder(stackModalConfig.folder.id, name);
-                addToast(content.toastUpdated, 'success');
+                addToast(content.toastStackUpdated, 'success');
               }
               setStackModalConfig({ ...stackModalConfig, isOpen: false });
             }}

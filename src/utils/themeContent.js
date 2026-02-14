@@ -66,6 +66,7 @@ export const themeContent = {
         toastUnarchived: "Back in the Stash 🙌",
         toastMoved: "Moved to",
         toastStackCreated: "Stack created! 📚",
+        toastStackUpdated: "Stack updated! 📝",
         toastStackNuked: "Stack destroyed 💥",
 
         // Password Modal
@@ -139,6 +140,7 @@ export const themeContent = {
         toastUnarchived: "Back to Base 🙌",
         toastMoved: "Deployed to",
         toastStackCreated: "Sector established! 🧱",
+        toastStackUpdated: "Sector updated! 🔧",
         toastStackNuked: "Sector demolished 💥",
 
         // Font Error
@@ -191,6 +193,7 @@ export const themeContent = {
         toastUnarchived: "Note unarchived.",
         toastMoved: "Moved to",
         toastStackCreated: "Folder created.",
+        toastStackUpdated: "Folder updated.",
         toastStackNuked: "Folder deleted.",
 
         // Modals - Soft Delete (To Trash)
