@@ -22,6 +22,8 @@ export const Sidebar = ({
     selectedFolder,
     onSelectFolder,
     onAddFolder,
+
+    onEditFolder,
     onDeleteFolder,
     searchQuery,
     onSearch,
@@ -205,15 +207,32 @@ export const Sidebar = ({
                                         </div>
                                         {folder.name}
                                     </button>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); onDeleteFolder(folder.id); }}
-                                        className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl opacity-0 group-hover/item:opacity-100 transition-all ${currentAccent === 'uncle'
-                                            ? 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
-                                            : 'text-gray-300 hover:text-coral hover:bg-coral/10'
-                                            }`}
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-all">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onEditFolder(folder); }}
+                                            className={`p-2 rounded-xl transition-all ${currentAccent === 'uncle'
+                                                ? 'text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-white/10'
+                                                : 'text-gray-300 hover:text-coral hover:bg-coral/10'
+                                                }`}
+                                            title="Rename"
+                                        >
+                                            <div className="w-3.5 h-3.5">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                                </svg>
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDeleteFolder(folder.id); }}
+                                            className={`p-2 rounded-xl transition-all ${currentAccent === 'uncle'
+                                                ? 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                : 'text-gray-300 hover:text-coral hover:bg-coral/10'
+                                                }`}
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
                                 </motion.div>
                             ))}
                         </AnimatePresence>

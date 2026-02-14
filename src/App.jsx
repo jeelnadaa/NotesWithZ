@@ -19,7 +19,7 @@ import { PasswordModal } from './components/PasswordModal';
 import { hashPassword, verifyPassword } from './utils/security';
 
 function App() {
-  const { notes, folders, addNote, updateNote, deleteNote, permanentlyDeleteNote, restoreNote, archiveNote, unarchiveNote, addFolder, deleteFolder, convertAllNotesToColor, archivePassword, setArchivePassword } = useNotes();
+  const { notes, folders, addNote, updateNote, deleteNote, permanentlyDeleteNote, restoreNote, archiveNote, unarchiveNote, addFolder, deleteFolder, renameFolder, convertAllNotesToColor, archivePassword, setArchivePassword } = useNotes();
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   // dateFilter state
   const [dateFilter, setDateFilter] = useState(() => {
@@ -45,7 +45,7 @@ function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isStackModalOpen, setIsStackModalOpen] = useState(false);
+  const [stackModalConfig, setStackModalConfig] = useState({ isOpen: false, mode: 'create', folder: null });
 
   // Toast State
   const [toasts, setToasts] = useState([]);
@@ -402,6 +402,7 @@ function App() {
           }
         }}
         onAddFolder={addFolder}
+        onEditFolder={(folder) => setStackModalConfig({ isOpen: true, mode: 'edit', folder })}
         onDeleteFolder={confirmDeleteFolder}
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
@@ -410,7 +411,7 @@ function App() {
         currentAccent={currentAccent}
         onSetAccent={setCurrentAccent}
         onShowImportant={showImportantInfo}
-        onOpenStackModal={() => setIsStackModalOpen(true)}
+        onOpenStackModal={() => setStackModalConfig({ isOpen: true, mode: 'create', folder: null })}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
@@ -542,22 +543,29 @@ function App() {
         isDarkMode={isDarkMode}
         onSetAccent={setCurrentAccent}
         onSelectFolder={setSelectedFolderId}
-        onOpenStackModal={() => setIsStackModalOpen(true)}
+        onOpenStackModal={() => setStackModalConfig({ isOpen: true, mode: 'create', folder: null })}
       />
 
       <AnimatePresence>
-        {isStackModalOpen && (
+        {stackModalConfig.isOpen && (
           <NewStackModal
             key="stack-modal"
-            isOpen={isStackModalOpen}
-            onClose={() => setIsStackModalOpen(false)}
-            onCreate={(name) => {
-              addFolder(name);
-              addToast(content.toastStackCreated, 'success');
-              setIsStackModalOpen(false);
+            isOpen={stackModalConfig.isOpen}
+            onClose={() => setStackModalConfig({ ...stackModalConfig, isOpen: false })}
+            onConfirm={(name) => {
+              if (stackModalConfig.mode === 'create') {
+                addFolder(name);
+                addToast(content.toastStackCreated, 'success');
+              } else {
+                renameFolder(stackModalConfig.folder.id, name);
+                addToast(content.toastUpdated, 'success');
+              }
+              setStackModalConfig({ ...stackModalConfig, isOpen: false });
             }}
             folders={folders}
             currentAccent={currentAccent}
+            mode={stackModalConfig.mode}
+            initialName={stackModalConfig.folder?.name || ''}
           />
         )}
       </AnimatePresence>

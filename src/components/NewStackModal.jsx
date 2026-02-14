@@ -3,18 +3,18 @@ import { X, Check, Sparkles, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getThemeContent } from '../utils/themeContent';
 
-export const NewStackModal = ({ isOpen, onClose, onCreate, folders, currentAccent }) => {
-    const [name, setName] = useState('');
+export const NewStackModal = ({ isOpen, onClose, onConfirm, folders, currentAccent, mode = 'create', initialName = '' }) => {
+    const [name, setName] = useState(initialName);
     const [error, setError] = useState('');
     const content = getThemeContent(currentAccent);
 
     // Reset state when opening
     useEffect(() => {
         if (isOpen) {
-            setName('');
+            setName(mode === 'edit' ? initialName : '');
             setError('');
         }
-    }, [isOpen]);
+    }, [isOpen, mode, initialName]);
 
     // Handle Escape key
     useEffect(() => {
@@ -36,12 +36,12 @@ export const NewStackModal = ({ isOpen, onClose, onCreate, folders, currentAccen
             return;
         }
 
-        if (folders.some(f => f.name.toLowerCase() === trimmed.toLowerCase())) {
+        if (folders.some(f => f.name.toLowerCase() === trimmed.toLowerCase() && f.name.toLowerCase() !== initialName.toLowerCase())) {
             setError(currentAccent === 'uncle' ? "A folder with this name already exists." : "This stack already exists! Be original 🙄");
             return;
         }
 
-        onCreate(trimmed);
+        onConfirm(trimmed);
     };
 
     if (!isOpen) return null;
@@ -65,7 +65,7 @@ export const NewStackModal = ({ isOpen, onClose, onCreate, folders, currentAccen
             >
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">
-                        {content.stackModalTitle}
+                        {mode === 'edit' ? (currentAccent === 'uncle' ? 'Rename Folder' : 'Rename Sector') : content.stackModalTitle}
                     </h2>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors">
                         <X size={20} className="text-gray-500" />
@@ -132,7 +132,7 @@ export const NewStackModal = ({ isOpen, onClose, onCreate, folders, currentAccen
                                 : 'bg-coral hover:bg-coral-hover text-white shadow-coral/20'
                             }`}
                     >
-                        {content.createStackBtn} <Check size={18} strokeWidth={3} />
+                        {mode === 'edit' ? (currentAccent === 'uncle' ? 'Update' : 'Update Sector') : content.createStackBtn} <Check size={18} strokeWidth={3} />
                     </button>
                 </form>
             </motion.div>

@@ -190,6 +190,10 @@ export function useNotes() {
         setFolders(prev => prev.filter(f => f.id !== id));
     };
 
+    const renameFolder = (id, newName) => {
+        setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name: newName } : f)));
+    };
+
     const convertAllNotesToColor = (color) => {
         setNotes(prev => prev.map(n => ({ ...n, color })));
     };
@@ -206,6 +210,7 @@ export function useNotes() {
         unarchiveNote,
         addFolder,
         deleteFolder,
+        renameFolder,
         convertAllNotesToColor,
         archivePassword,
         setArchivePassword
